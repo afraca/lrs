@@ -1,9 +1,8 @@
 'use strict';
 
-var 
-    queryParser = require("../queryParser"),
-	db = require("../db"),
-    constants = require("../constants");
+var queryParser = require('../queryParser');
+var db = require('../db');
+var constants = require('../constants');
 
 module.exports = function*() {
     var query = this.request.query || {};
@@ -12,8 +11,7 @@ module.exports = function*() {
         if (Object.keys(query).length !== 1) {
             this.body = 'You can not supply other params along with statementId';
             this.status = 400;
-        }
-        else {
+        } else {
             var statement = yield db.statements.findOne({
                 id: query.statementId
             });
@@ -22,15 +20,14 @@ module.exports = function*() {
                 this.status = 200;
             }
         }
-    }
-    else {
+    } else {
         var options = queryParser.generateOptions(query, constants.defaultLimit, constants.defaultSkip);
-       
-        var statements = yield db.statements.find(options.criteria, { limit: options.specifiedLimit, skip: options.specifiedSkip, sort: { timestamp: -1 }, fields : { _id: 0 } });
+
+        var statements = yield db.statements.find(options.criteria, { limit: options.specifiedLimit, skip: options.specifiedSkip, sort: { timestamp: -1 }, fields: { _id: 0 } });
         
         if (statements) {
             this.status = 200;
             this.body = { statements: statements };
         }
     }
-}
+};

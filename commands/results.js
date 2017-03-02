@@ -1,9 +1,8 @@
 'use strict';
 
-var 
-    db = require("../db"),
-    constants = require("../constants"),
-    jsonStream = require("../utils/jsonStream");
+var db = require('../db');
+var constants = require('../constants');
+var jsonStream = require('../utils/jsonStream');
 
 var fields = {
     root: 1,
@@ -29,66 +28,67 @@ module.exports = {
         });
         return cursor.stream().pipe(jsonStream.stringify(transform).apply(this, getJsonStreamWrapperParameters('statements')));
     },
-    *getAttempt(attempt_id) {
-        return yield db.results.findOne({ attempt_id });
+    *getAttempt(attemptId) {
+        return yield db.results.findOne({ attempt_id: attemptId });
     },
     *getChildStatements(registration, objectId) {
         return yield db.statements.find({
-            "context.registration": registration,
-            "verb.id": { "$in": [constants.statementsVerbs.answered, constants.statementsVerbs.experienced] },
-            "context.contextActivities.parent.id": { "$in": [objectId] }
+            'context.registration': registration,
+            'verb.id': { '$in': [constants.statementsVerbs.answered, constants.statementsVerbs.experienced] },
+            'context.contextActivities.parent.id': { '$in': [objectId] }
         });
     },
     *insert(result) {
         return yield db.results.insert(result);
     },
-    *markRootAsModified(_id, last_activity) {
-        return yield db.results.update({ _id }, { "$set": { last_activity } });
+    *markRootAsModified(_id, lastActivity) {
+        return yield db.results.update({ _id }, { '$set': { last_activity: lastActivity } });
     },
-    *markEmbededAsModified(_id, objectId, last_activity) {
-        return yield db.results.update({ _id, "embeded.objectId": objectId }, { "$set": { "embeded.$.last_activity": last_activity } });
+    *markEmbededAsModified(_id, objectId, lastActivity) {
+        return yield db.results.update({ _id, 'embeded.objectId': objectId }, { '$set': { 'embeded.$.last_activity': lastActivity } });
     },
     *pushToRoot(_id, statement) {
-        return yield db.results.update({ _id }, { "$push": { root: statement } });
+        return yield db.results.update({ _id }, { '$push': { root: statement } });
     },
     *pushToEmbeded(_id, embeded) {
-        return yield db.results.update({ _id }, { "$push": { embeded }});
+        return yield db.results.update({ _id }, { '$push': { embeded } });
     },
     *pushToEmbededRoot(_id, objectId, statement) {
-        return yield db.results.update({ _id, "embeded.objectId": objectId }, { "$push": { "embeded.$.root": statement } });
+        return yield db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.root': statement } });
     },
     *pushToAnswered(_id, objectId, statement) {
-        return yield db.results.update({ _id, "embeded.objectId": objectId }, { "$push": { "embeded.$.answered": statement } });
+        return yield db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.answered': statement } });
     },
     *pushToExperienced(_id, objectId, statement) {
-        return yield db.results.update({ _id, "embeded.objectId": objectId }, { "$push": { "embeded.$.experienced": statement } });
+        return yield db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.experienced': statement } });
     }
 };
 
-function getJsonStreamWrapperParameters(wrapper){
+function getJsonStreamWrapperParameters(wrapper) {
     return ['{"' + wrapper + '":[', ',', ']}'];
 };
 
 function getComparator(dateFieldName) {
-    return (a, b) => ((new Date(a[dateFieldName])).getTime() < (new Date(b[dateFieldName])).getTime()) ? 1: -1;
+    return (a, b) => ((new Date(a[dateFieldName])).getTime() < (new Date(b[dateFieldName])).getTime()) ? 1 : -1;
 };
 
 function transform(result) {
-    if(!result) 
+    if (!result) {
         return;
-    if(result.root && result.root.length){
+    }
+    if (result.root && result.root.length) {
         result.root = result.root.sort(getComparator('timestamp'));
     }
-    if(result.embeded && result.embeded.length) {
+    if (result.embeded && result.embeded.length) {
         result.embeded = result.embeded.sort(getComparator('last_activity'));
         result.embeded.forEach(group => {
-            if(group.root && group.root.length){
+            if (group.root && group.root.length) {
                 group.root = group.root.sort(getComparator('timestamp'));
             }
-            if(group.answered && group.answered.length) {
+            if (group.answered && group.answered.length) {
                 group.answered = group.answered.sort(getComparator('timestamp'));
             }
-            if(group.experienced && group.experienced.length) {
+            if (group.experienced && group.experienced.length) {
                 group.experienced = group.experienced.sort(getComparator('timestamp'));
             }
         });
