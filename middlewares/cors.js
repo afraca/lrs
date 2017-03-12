@@ -1,13 +1,13 @@
 'use strict';
 
-module.exports = function*(next) {
-    this.set('Access-Control-Allow-Origin', '*');
-    this.set('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    this.set('Access-Control-Allow-Headers', 'X-Experience-API-Version,Accept,Authorization,Content-Type,If-Match,If-None-Match');
+module.exports = async (ctx, next) => {
+    ctx.set('Access-Control-Allow-Origin', '*');
+    ctx.set('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    ctx.set('Access-Control-Allow-Headers', 'X-Experience-API-Version,X-Access-Token,X-Id-Token,X-Entity-Id,X-Entity-Type,Accept,Authorization,Content-Type,If-Match,If-None-Match');
     
-    if (this.method === 'OPTIONS') {
-        this.status = 200;
+    if (ctx.method === 'OPTIONS') {
+        ctx.status = 200;
     } else {
-        yield next;
+        await next();
     }
 };

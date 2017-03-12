@@ -1,4 +1,4 @@
-var through = require('through');
+const through = require('through');
 
 module.exports = {
     stringify(transform) {

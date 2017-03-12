@@ -1,47 +1,47 @@
 'use strict';
 
-var _ = require('underscore');
-var constants = require('../constants');
-var statementsInformer = require('./statementsInformer');
-var command = require('../commands/results');
+const _ = require('underscore');
+const constants = require('../constants');
+const statementsInformer = require('./statementsInformer');
+const command = require('../commands/results');
 
 module.exports = {
-    *update(statement) {
+    async update(statement) {
         if (!statementsInformer.isCourseStatement(statement)) { return; }
         var result = null;
         var embeded = null;
         if (statementsInformer.isStarted(statement)) {
-            result = yield* command.getAttempt(statement.context.registration);
+            result = await command.getAttempt(statement.context.registration);
             if (result) { return; }
             result = createResult(statement);
-            yield* command.insert(result);
+            await command.insert(result);
         } else if (statementsInformer.isCourseProgressable(statement)) {
-            result = yield* command.getAttempt(statement.context.registration);
+            result = await command.getAttempt(statement.context.registration);
             if (!result || !result.root) { return; }
-            yield* command.pushToRoot(result._id, statement);
-            yield* command.markRootAsModified(result._id, statement.timestamp);
+            await command.pushToRoot(result._id, statement);
+            await command.markRootAsModified(result._id, statement.timestamp);
         } else if (statementsInformer.isObjectiveProgressable(statement)) {
-            result = yield* command.getAttempt(statement.context.registration);
+            result = await command.getAttempt(statement.context.registration);
             if (!result) { return; }
             embeded = result.embeded ? _.find(result.embeded, item => item.objectId === statement.object.id) : null;
             if (!embeded) {
                 embeded = createEmbededResult(statement);
-                var child = yield* command.getChildStatements(statement.context.registration, statement.object.id);
+                var child = await command.getChildStatements(statement.context.registration, statement.object.id);
                 applyChildStatements(embeded, child);
-                yield* command.pushToEmbeded(result._id, embeded);
+                await command.pushToEmbeded(result._id, embeded);
             } else {
-                yield* command.pushToEmbededRoot(result._id, embeded.objectId, statement);
+                await command.pushToEmbededRoot(result._id, embeded.objectId, statement);
             }
-            yield* command.markEmbededAsModified(result._id, embeded.objectId, statement.timestamp);
+            await command.markEmbededAsModified(result._id, embeded.objectId, statement.timestamp);
         } else if (statementsInformer.isAnswered(statement) || statementsInformer.isExperienced(statement)) {
-            result = yield* command.getAttempt(statement.context.registration);
+            result = await command.getAttempt(statement.context.registration);
             if (!result || !result.embeded) { return; }
             embeded = _.find(result.embeded, e => _.some(statement.context.contextActivities.parent, parent => parent.id === e.objectId));
             if (!embeded) { return; }
             if (statementsInformer.isAnswered(statement)) {
-                yield* command.pushToAnswered(result._id, embeded.objectId, statement);
+                await command.pushToAnswered(result._id, embeded.objectId, statement);
             } else {
-                yield* command.pushToExperienced(result._id, embeded.objectId, statement);
+                await command.pushToExperienced(result._id, embeded.objectId, statement);
             }
         }
     }

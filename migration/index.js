@@ -1,21 +1,21 @@
-var _ = require('underscore');
-var db = require('../db');
-var fs = require('fs');
-var constants = require('../constants');
+const fs = require('fs');
+const _ = require('underscore');
+const db = require('../db');
+const constants = require('../constants');
 
 module.exports = {
-    *build() {
+    async build() {
         var moreThanOneAttemptCount = 0;
         var moreThan100AttemptCount = 0;
-        var ids = yield* this.getIds();
+        var ids = await this.getIds();
         for (var i = 0; i < ids.length; i++) {
-            var statements = yield* this.getRootStatements(ids[i]);
+            var statements = await this.getRootStatements(ids[i]);
             for (var j = 0; j < statements.length; j++) {
                 var attemptId = statements[j]._id;
                 if (!attemptId) {
                     continue;
                 }
-                var child = yield* this.getEmbededStatements(statements[j]._id);
+                var child = await this.getEmbededStatements(statements[j]._id);
                 if (!child || !child.length) {
                     continue;
                 }
@@ -38,7 +38,7 @@ module.exports = {
                 object.id = ids[i];
                 object.attempt_id = object._id;
                 delete object._id;
-                yield db.results.insert(object);
+                await db.results.insert(object);
             }
 
             console.log(i + ' / ' + ids.length);
@@ -52,11 +52,11 @@ module.exports = {
         console.log('Courses with more than 1 attempt: ' + moreThanOneAttemptCount);
         console.log('Total courses: ' + ids.length);
     },
-    *getIds(storeInfile) {
+    async getIds(storeInfile) {
         try {
-            var ids = yield db.statements.distinct('context.extensions.http://easygenerator/expapi/course/id');
+            var ids = await db.statements.distinct('context.extensions.http://easygenerator/expapi/course/id');
             if (storeInfile) {
-                yield this.writeToFile('migration/tmp_files/ids.json', ids);
+                await this.writeToFile('migration/tmp_files/ids.json', ids);
             }
             console.log('successfully got ids');
             return ids;
@@ -65,8 +65,8 @@ module.exports = {
             return null;
         }
     },
-    *getRootStatements(id) {
-        var rootStatements = yield db.statements.aggregate([
+    async getRootStatements(id) {
+        var rootStatements = await db.statements.aggregate([
             {
                 $match: { $and: [
                     { 'context.extensions.http://easygenerator/expapi/course/id': id },
@@ -90,8 +90,8 @@ module.exports = {
         ], { allowDiskUse: true, cursor: { batchSize: 500 } });
         return rootStatements;
     },
-    *getEmbededStatements(attemptId) {
-        return yield db.statements.aggregate([
+    async getEmbededStatements(attemptId) {
+        return await db.statements.aggregate([
             {
                 $match: { $and: [
                     { 'context.registration': attemptId },

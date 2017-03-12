@@ -19,5 +19,10 @@ module.exports = {
         course: 'http://adlnet.gov/expapi/activities/course',
         objective: 'http://adlnet.gov/expapi/activities/objective'
     },
-    courseKey: 'http://easygenerator/expapi/course/id'
+    courseKey: 'http://easygenerator/expapi/course/id',
+    learningPathKey: 'http://easygenerator/expapi/learningpath/id',
+    entityTypes: {
+        course: 'course',
+        learningPath: 'learningpath'
+    }
 };

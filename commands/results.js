@@ -1,8 +1,8 @@
 'use strict';
 
-var db = require('../db');
-var constants = require('../constants');
-var jsonStream = require('../utils/jsonStream');
+const db = require('../db');
+const constants = require('../constants');
+const jsonStream = require('../utils/jsonStream');
 
 var fields = {
     root: 1,
@@ -12,14 +12,14 @@ var fields = {
 };
 
 module.exports = {
-    *getRoot(id, specifiedSkip, specifiedLimit) {
-        return yield* this.get(Object.assign({}, fields), id, specifiedSkip, specifiedLimit);
+    async getRoot(id, specifiedSkip, specifiedLimit) {
+        return await this.get(Object.assign({}, fields), id, specifiedSkip, specifiedLimit);
     },
-    *getFull(id, specifiedSkip, specifiedLimit) {
-        return yield* this.get(Object.assign({ embeded: 1 }, fields), id, specifiedSkip, specifiedLimit);
+    async getFull(id, specifiedSkip, specifiedLimit) {
+        return await this.get(Object.assign({ embeded: 1 }, fields), id, specifiedSkip, specifiedLimit);
     },
-    *get(fields, id, specifiedSkip, specifiedLimit) {
-        var cursor = yield db.results.find({ id }, {
+    async get(fields, id, specifiedSkip, specifiedLimit) {
+        var cursor = await db.results.find({ id }, {
             fields,
             sort: { last_activity: -1 },
             skip: specifiedSkip || constants.defaultSkip,
@@ -28,39 +28,39 @@ module.exports = {
         });
         return cursor.stream().pipe(jsonStream.stringify(transform).apply(this, getJsonStreamWrapperParameters('statements')));
     },
-    *getAttempt(attemptId) {
-        return yield db.results.findOne({ attempt_id: attemptId });
+    getAttempt(attemptId) {
+        return db.results.findOne({ attempt_id: attemptId });
     },
-    *getChildStatements(registration, objectId) {
-        return yield db.statements.find({
+    getChildStatements(registration, objectId) {
+        return db.statements.find({
             'context.registration': registration,
             'verb.id': { '$in': [constants.statementsVerbs.answered, constants.statementsVerbs.experienced] },
             'context.contextActivities.parent.id': { '$in': [objectId] }
         });
     },
-    *insert(result) {
-        return yield db.results.insert(result);
+    insert(result) {
+        return db.results.insert(result);
     },
-    *markRootAsModified(_id, lastActivity) {
-        return yield db.results.update({ _id }, { '$set': { last_activity: lastActivity } });
+    markRootAsModified(_id, lastActivity) {
+        return db.results.update({ _id }, { '$set': { last_activity: lastActivity } });
     },
-    *markEmbededAsModified(_id, objectId, lastActivity) {
-        return yield db.results.update({ _id, 'embeded.objectId': objectId }, { '$set': { 'embeded.$.last_activity': lastActivity } });
+    markEmbededAsModified(_id, objectId, lastActivity) {
+        return db.results.update({ _id, 'embeded.objectId': objectId }, { '$set': { 'embeded.$.last_activity': lastActivity } });
     },
-    *pushToRoot(_id, statement) {
-        return yield db.results.update({ _id }, { '$push': { root: statement } });
+    pushToRoot(_id, statement) {
+        return db.results.update({ _id }, { '$push': { root: statement } });
     },
-    *pushToEmbeded(_id, embeded) {
-        return yield db.results.update({ _id }, { '$push': { embeded } });
+    pushToEmbeded(_id, embeded) {
+        return db.results.update({ _id }, { '$push': { embeded } });
     },
-    *pushToEmbededRoot(_id, objectId, statement) {
-        return yield db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.root': statement } });
+    pushToEmbededRoot(_id, objectId, statement) {
+        return db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.root': statement } });
     },
-    *pushToAnswered(_id, objectId, statement) {
-        return yield db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.answered': statement } });
+    pushToAnswered(_id, objectId, statement) {
+        return db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.answered': statement } });
     },
-    *pushToExperienced(_id, objectId, statement) {
-        return yield db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.experienced': statement } });
+    pushToExperienced(_id, objectId, statement) {
+        return db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.experienced': statement } });
     }
 };
 
