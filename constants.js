@@ -24,5 +24,8 @@ module.exports = {
     entityTypes: {
         course: 'course',
         learningPath: 'learningpath'
+    },
+    accessTypes: {
+        academy: 3
     }
 };

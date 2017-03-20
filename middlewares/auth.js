@@ -7,16 +7,19 @@ const db = require('../db');
 const httpRequestSender = require('../utils/httpRequestSender');
 
 module.exports = async (ctx, next) => {
-    const accessToken = ctx.get('X-Access-Token');
-    if (accessToken) {
-        let info = await db.tokens.findOne({ id: accessToken });
-        if (!info || !info.entityId || !info.entityType || !info.scopes.read) {
-            return reject(ctx);
+    if (ctx.originalUrl.indexOf('accessTokens') === -1) {
+        const accessToken = ctx.get('X-Access-Token');
+        if (accessToken) {
+            let info = await db.tokens.findOne({ id: accessToken });
+            if (!info || info.revoked || !info.entityId || !info.entityType || info.scopes.indexOf('read') === -1 || !info.createdBy) {
+                return reject(ctx);
+            }
+            ctx.entityId = info.entityId;
+            ctx.entityType = info.entityType;
+            ctx.identityId = info.createdBy;
+            await next();
+            return;
         }
-        ctx.entityId = info.entityId;
-        ctx.entityType = info.entityType;
-        await next();
-        return;
     }
     const idToken = ctx.get('X-Id-Token');
     const entityId = ctx.get('X-Entity-Id');
@@ -28,6 +31,7 @@ module.exports = async (ctx, next) => {
         let token = decodeJWT(idToken);
         let protocol = 'https';
         let issuer = token.iss;
+        let identityId = token.unique_name;
         // TODO: fix bug with local issuer
         if (issuer === 'localhost') {
             protocol = 'http';
@@ -46,11 +50,13 @@ module.exports = async (ctx, next) => {
         let response = await httpRequestSender.post(protocol + '://' + config.permissionsEndpoint.hosts[hostIndex] + path, data, {
             Authorization: `Bearer ${idToken}`
         });
-        if (!response || response.statusCode !== 200) {
+        if (!response || !response.body || response.statusCode !== 200) {
             return reject(ctx);
         }
         ctx.entityId = entityId;
         ctx.entityType = entityType;
+        ctx.identityId = identityId;
+        ctx.identityAccessLevel = response.body.data;
         await next();
     } catch (e) {
         reject(ctx);

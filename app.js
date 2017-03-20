@@ -13,6 +13,7 @@ const aboutRouteHandler = require('./routeHandlers/about');
 const statementsRouteHandler = require('./routeHandlers/statements');
 const resultsRouteHandler = require('./routeHandlers/results');
 const insertRouteHandler = require('./routeHandlers/insert');
+const accessTokensRouteHandler = require('./routeHandlers/accessTokens');
 
 const VERSION = '1.0.2';
 
@@ -41,6 +42,10 @@ app.use(auth);
 
 app.use(route.get('/xAPI/statements', statementsRouteHandler));
 app.use(route.get('/xAPI/results', resultsRouteHandler));
+
+app.use(route.get('/accessTokens', accessTokensRouteHandler.getTokens));
+app.use(route.post('/accessTokens/:tokenId/revoke', accessTokensRouteHandler.revokeToken));
+app.use(route.post('/accessTokens/:tokenId?/enable', accessTokensRouteHandler.enableToken));
 
 var server = http.createServer(app.callback());
 server.setTimeout(constants.socketLifetime);

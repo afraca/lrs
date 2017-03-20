@@ -14,7 +14,8 @@
     "request": "^2.81.0",
     "request-promise": "^4.1.1",
     "through": "^2.3.8",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "eslint": "^3.16.1",
@@ -30,12 +31,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/andreydrebot/lrs.git"
+    "url": "git://github.com/easygenerator/lrs.git"
   },
-  "author": "",
+  "author": "easygenerator",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/andreydrebot/lrs/issues"
+    "url": "https://github.com/easygenerator/lrs/issues"
   },
-  "homepage": "https://github.com/andreydrebot/lrs"
+  "homepage": "https://github.com/easygenerator/lrs"
 }
