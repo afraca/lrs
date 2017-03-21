@@ -2,6 +2,7 @@
 
 const uuid = require('uuid');
 const db = require('../db');
+const config = require('../config');
 const constants = require('../constants');
 
 module.exports = {
@@ -36,6 +37,17 @@ module.exports = {
             tokenId = token.id;
         }
         ctx.body = { id: tokenId };
+        ctx.status = 200;
+    },
+    async revokeAllTokens(ctx) {
+        const apiKey = ctx.get('X-API-Key');
+        if (apiKey === config.apiKey) {
+            const owner = ctx.request.body.userEmail;
+            if (owner) {
+                await db.tokens.update({ createdBy: owner }, { $set: { revoked: true } });
+            }
+        }
+        ctx.body = { success: true };
         ctx.status = 200;
     }
 };

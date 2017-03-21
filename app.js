@@ -36,6 +36,8 @@ app.use(async (ctx, next) => {
     ctx.set(header, VERSION);
 });
 
+app.use(route.post('/accessTokens/revoke', accessTokensRouteHandler.revokeAllTokens));
+
 app.use(route.post('/xAPI/statements', insertRouteHandler));
 
 app.use(auth);
