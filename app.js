@@ -8,14 +8,13 @@ const route = require('koa-route');
 const compress = require('koa-compress');
 const cors = require('./middlewares/cors');
 const auth = require('./middlewares/auth');
+const config = require('./config');
 const constants = require('./constants');
 const aboutRouteHandler = require('./routeHandlers/about');
 const statementsRouteHandler = require('./routeHandlers/statements');
 const resultsRouteHandler = require('./routeHandlers/results');
 const insertRouteHandler = require('./routeHandlers/insert');
 const accessTokensRouteHandler = require('./routeHandlers/accessTokens');
-
-const VERSION = '1.0.2';
 
 var app = new Koa();
 app.use(compress());
@@ -27,13 +26,13 @@ app.use(route.get('/xAPI/about', aboutRouteHandler));
 
 app.use(async (ctx, next) => {
     const header = 'X-Experience-API-Version';
-    if (ctx.get(header) && ctx.get(header).substring(0, 3) === VERSION.substring(0, 3)) {
+    if (ctx.get(header) && ctx.get(header).substring(0, 3) === config.version.substring(0, 3)) {
         await next();
     } else {
         ctx.body = 'Invalid \'X-Experience-API-Version\' header was supplied';
         ctx.status = 400;
     }
-    ctx.set(header, VERSION);
+    ctx.set(header, config.version);
 });
 
 app.use(route.post('/accessTokens/revoke', accessTokensRouteHandler.revokeAllTokens));

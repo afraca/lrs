@@ -1,0 +1,1 @@
+Set CONFIG=staging&Set API_KEY=%1&npm i&node deploy.js

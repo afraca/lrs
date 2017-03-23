@@ -1,8 +1,12 @@
 module.exports = {
+    version: '1.0.2',
     permissionsEndpoint: {
-        hosts: ['localhost:666'],
+        hosts: [
+            'localhost',
+            /^\S+\.easygenerator.com$/
+        ],
         coursePath: '/api/course/permissions',
         learningPathPath: '/api/learningpath/permissions'
     },
-    apiKey: '15e8fa1857254630abfccc23ec73ced61e29947d081b4d898edaeeaf7fbae5ee'
+    apiKey: 'yourApiKey'
 };

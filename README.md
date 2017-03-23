@@ -1,14 +1,14 @@
-#Deployment
+# Deployment
 
 
-##Before deployment
+## Before deployment
 
 1. Install nodejs [v7.xx.xx](http://nodejs.org/dist/)
 2. Install iisnode for IIS 7.x/8.x: [x86](https://github.com/azure/iisnode/releases/download/v0.2.16/iisnode-full-v0.2.16-x86.msi) or [x64](https://github.com/azure/iisnode/releases/download/v0.2.16/iisnode-full-v0.2.16-x64.msi)
 3. Install [URL Rewrite](http://www.iis.net/download/URLRewrite) for IIS
 4. Install Mongo DB [2.6.7 (or latest)](http://www.mongodb.org/downloads)
 
-##Deployment
+## Deployment
 
 ### Configuring database
 1. Run Mongo DB as [win service](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/#run-the-mongodb-service)
@@ -85,9 +85,13 @@
 
     `nodeProcessCommandLine: node.exe --harmony #full path can be used here as well`
 
-5. Copy folder to the server (without `.git` and `package.json`:))
-6. Create Web site in IIS and add corresponding site bindings and permissions
-7. To generate results into results collection from existing data in statements collection run:
+5. Modify `config.js` file for your environment if needed.
+6. Set `CONFIG` environment variable to build for `development` or `production`, `API_KEY` variable to change secret API key, and run `node deploy.js` command to build your package.
+   By default package will be created at `D:/Applications/lrs` folder.
+
+7. Copy generated package to your server.
+8. Create Web site in IIS and add corresponding site bindings and permissions
+9. To generate results into results collection from existing data in statements collection run:
 
     `node migration/exec.js`
 

@@ -29,16 +29,9 @@ module.exports = async (ctx, next) => {
     }
     try {
         let token = decodeJWT(idToken);
-        let protocol = 'https';
         let issuer = token.iss;
         let identityId = token.unique_name;
-        // TODO: fix bug with local issuer
-        if (issuer === 'localhost') {
-            protocol = 'http';
-            issuer = 'localhost:666';
-        }
-        let hostIndex = config.permissionsEndpoint.hosts.indexOf(issuer);
-        if (!issuer || hostIndex === -1) {
+        if (!isKnownIssuer(issuer)) {
             return reject(ctx);
         }
         let path = config.permissionsEndpoint.coursePath;
@@ -47,11 +40,16 @@ module.exports = async (ctx, next) => {
             path = config.permissionsEndpoint.learningPathPath;
             data = { learningpathId: entityId };
         }
-        let response = await httpRequestSender.post(protocol + '://' + config.permissionsEndpoint.hosts[hostIndex] + path, data, {
-            Authorization: `Bearer ${idToken}`
-        });
-        if (!response || !response.body || response.statusCode !== 200) {
-            return reject(ctx);
+        let response;
+        if (issuer === 'localhost') {
+            response = { body: { data: constants.accessTypes.academy } };
+        } else {
+            response = await httpRequestSender.post('https://' + issuer + path, data, {
+                Authorization: `Bearer ${idToken}`
+            });
+            if (!response || !response.body || response.statusCode !== 200) {
+                return reject(ctx);
+            }
         }
         ctx.entityId = entityId;
         ctx.entityType = entityType;
@@ -62,6 +60,22 @@ module.exports = async (ctx, next) => {
         reject(ctx);
     }
 };
+
+function isKnownIssuer(issuer) {
+    const knownIssuers = config.permissionsEndpoint.hosts;
+    for (let knownIssuer of knownIssuers) {
+        if (knownIssuer instanceof RegExp) {
+            if (knownIssuer.test(issuer)) {
+                return true;
+            }
+        } else {
+            if (knownIssuer === issuer) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 function reject(request) {
     request.body = 'Access denied';
