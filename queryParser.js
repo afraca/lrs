@@ -1,17 +1,16 @@
 'use strict';
 
-var constants = require("./constants");
+var constants = require('./constants');
 
 module.exports = {
-    generateOptions: function (query, defaultLimit, defaultSkip) {
+    generateOptions: function(query, defaultLimit, defaultSkip) {
         var objectId = {};
         var criteria = {};
         var specifiedLimit;
         var specifiedSkip;
         var activityType;
-        
-        for (var prop in query) {
 
+        for (var prop in query) {
             if (prop === 'limit') {
                 specifiedLimit = parseInt(query.limit, 10);
                 if (isNaN(specifiedLimit) || specifiedLimit < 1) {
@@ -25,13 +24,13 @@ module.exports = {
                     specifiedSkip = defaultSkip;
                 }
             }
-            
+
             if (prop === 'type') {
                 activityType = query.type;
             }
-            
+
             if (prop === 'verb') {
-                var verbs = query.verb.split(',')
+                var verbs = query.verb.split(',');
                 if (verbs.length === 1) {
                     criteria['verb.id'] = verbs[0];
                 } else if (verbs.length > 1) {
@@ -62,7 +61,7 @@ module.exports = {
                 if (query.agent.objectType === 'Agent') {
                     var actorMailToIRI = query.agent.mbox;
                     if (actorMailToIRI.indexOf('mailto:') !== 0) {
-                    actorMailToIRI = 'mailto:' + actorMailToIRI;
+                        actorMailToIRI = 'mailto:' + actorMailToIRI;
                     }
                     criteria['actor.mbox'] = actorMailToIRI;
                 }
@@ -72,21 +71,21 @@ module.exports = {
                 criteria['context.contextActivities.parent.id'] = query.parent;
             }
         }
-        
-        if(activityType && criteria && criteria['verb.id'] && criteria['verb.id'].$in && criteria['verb.id'].$in.length) {
+
+        if (activityType && criteria && criteria['verb.id'] && criteria['verb.id'].$in && criteria['verb.id'].$in.length) {
             var verbArray = criteria['verb.id'].$in;
             var progressedIndex = verbArray.indexOf(constants.statementsVerbs.progressed);
-            if(progressedIndex != -1) {
+            if (progressedIndex !== -1) {
                 verbArray.splice(progressedIndex, 1);
                 delete criteria['verb.id'];
-                criteria['$or'] = [ 
+                criteria['$or'] = [
                     {
                         'verb.id': { $in: verbArray }
                     },
                     {
                         $and: [
                             {
-                                'verb.id': constants.statementsVerbs.progressed 
+                                'verb.id': constants.statementsVerbs.progressed
                             },
                             {
                                 'object.definition.type': activityType
@@ -96,12 +95,12 @@ module.exports = {
                 ];
             }
         }
-        
+
         return {
             objectId: objectId,
             criteria: criteria,
             specifiedLimit: specifiedLimit,
             specifiedSkip: specifiedSkip
-        }
+        };
     }
-}
+};

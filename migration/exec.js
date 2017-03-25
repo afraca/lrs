@@ -1,8 +1,5 @@
-// install co before executing results build
+const migrationManager = require('../migration');
 
-var co = require('co');
-var migrationManager = require('../migration');
-
-co(migrationManager.build()).then(() => {
+migrationManager.build().then(() => {
     console.log('finished');
 }).catch(err => { throw err; });

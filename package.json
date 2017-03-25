@@ -4,27 +4,39 @@
   "description": "lrs ===",
   "main": "app.js",
   "dependencies": {
-    "co-body": "^1.0.0",
-    "koa": "^0.13.0",
-    "koa-compress": "^1.0.8",
-    "koa-logger": "^1.2.2",
-    "koa-route": "^2.2.0",
-    "monk": "^3.1.3",
+    "jwt-decode": "^2.1.0",
+    "koa": "^2.1.0",
+    "koa-bodyparser": "^4.1.0",
+    "koa-compress": "^2.0.0",
+    "koa-logger": "^2.0.1",
+    "koa-route": "^3.2.0",
+    "monk": "^4.0.0",
+    "request": "^2.81.0",
+    "request-promise": "^4.1.1",
     "through": "^2.3.8",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "uuid": "^3.0.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^3.16.1",
+    "eslint-config-standard": "^7.0.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^2.1.0",
+    "husky": "^0.13.1"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "precommit": "npm run lint",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint -c .eslintrc ./"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/andreydrebot/lrs.git"
+    "url": "git://github.com/easygenerator/lrs.git"
   },
-  "author": "",
+  "author": "easygenerator",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/andreydrebot/lrs/issues"
+    "url": "https://github.com/easygenerator/lrs/issues"
   },
-  "homepage": "https://github.com/andreydrebot/lrs"
+  "homepage": "https://github.com/easygenerator/lrs"
 }

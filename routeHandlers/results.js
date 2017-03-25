@@ -1,27 +1,29 @@
 'use strict';
 
-var 
-    queryParser = require("../queryParser"),
-    constants = require("../constants"),
-    command = require('../commands/results');
+const queryParser = require('../queryParser');
+const queryExtender = require('../helpers/queryExtender');
+const constants = require('../constants');
+const command = require('../commands/results');
 
-var courseKey = 'context.extensions.' + constants.courseKey;
+const courseKey = 'context.extensions.' + constants.courseKey;
 
-module.exports = function*() {
-    var query = this.request.query || {};
+module.exports = async ctx => {
+    var query = ctx.request.query || {};
+    queryExtender.addEntityInfoToQuery(query, ctx.entityId, ctx.entityType);
+    
     var loadEmbededStatements = query.embeded;
     var options = queryParser.generateOptions(query, constants.defaultLimit, constants.defaultSkip);
-    
+
     var stream;
-    if(loadEmbededStatements) {
-        stream = yield* command.getFull(options.objectId[courseKey], options.specifiedSkip, options.specifiedLimit);
+    if (loadEmbededStatements) {
+        stream = await command.getFull(options.objectId[courseKey], options.specifiedSkip, options.specifiedLimit);
     } else {
-        stream = yield* command.getRoot(options.objectId[courseKey], options.specifiedSkip, options.specifiedLimit);
+        stream = await command.getRoot(options.objectId[courseKey], options.specifiedSkip, options.specifiedLimit);
     }
 
     if (stream) {
-        this.status = 200;
-        this.type = 'application/json';
-        this.body = stream;
+        ctx.status = 200;
+        ctx.type = 'application/json';
+        ctx.body = stream;
     }
-}
+};

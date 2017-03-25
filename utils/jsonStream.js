@@ -1,4 +1,4 @@
-var through = require('through');
+const through = require('through');
 
 module.exports = {
     stringify(transform) {
@@ -19,9 +19,9 @@ function jsonStringify(transform, op, sep, cl, indent) {
         sep = '\n,\n';
         cl = '\n]\n';
     }
-    var stream,
-    first = true,
-    anyData = false,
+    var stream;
+    var first = true;
+    var anyData = false;
     stream = through(data => {
         anyData = true;
         var json;
@@ -31,14 +31,14 @@ function jsonStringify(transform, op, sep, cl, indent) {
         } catch (err) {
             return stream.emit('error', err);
         }
-        if(first) {
+        if (first) {
             first = false;
             stream.queue(op + json);
-        }
-        else stream.queue(sep + json);
+        } else stream.queue(sep + json);
     }, data => {
-    if(!anyData)
-        stream.queue(op);
+        if (!anyData) {
+            stream.queue(op);
+        }
         stream.queue(cl);
         stream.queue(null);
     });
