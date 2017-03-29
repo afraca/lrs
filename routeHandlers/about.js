@@ -1,8 +1,10 @@
 'use strict';
 
+const config = require('../config');
+
 module.exports = ctx => {
     ctx.body = {
-        version: '1.0.2'
+        version: config.xApiVersion
     };
     ctx.status = 200;
 };
