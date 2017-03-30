@@ -26,13 +26,13 @@ app.use(route.get('/xAPI/about', aboutRouteHandler));
 
 app.use(async (ctx, next) => {
     const header = 'X-Experience-API-Version';
-    if (ctx.get(header) && ctx.get(header).substring(0, 3) === config.version.substring(0, 3)) {
+    if (ctx.get(header) && ctx.get(header).substring(0, 3) === config.xApiVersion.substring(0, 3)) {
         await next();
     } else {
         ctx.body = 'Invalid \'X-Experience-API-Version\' header was supplied';
         ctx.status = 400;
     }
-    ctx.set(header, config.version);
+    ctx.set(header, config.xApiVersion);
 });
 
 app.use(route.post('/accessTokens/revoke', accessTokensRouteHandler.revokeAllTokens));

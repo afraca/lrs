@@ -1,5 +1,5 @@
 module.exports = {
-    version: '1.0.2',
+    xApiVersion: '1.0.2',
     permissionsEndpoint: {
         hosts: [
             'localhost',
