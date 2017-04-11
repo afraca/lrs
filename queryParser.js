@@ -3,14 +3,14 @@
 var constants = require('./constants');
 
 module.exports = {
-    generateOptions: function(query, defaultLimit, defaultSkip) {
+    generateOptions(query, defaultLimit, defaultSkip) {
         var objectId = {};
         var criteria = {};
         var specifiedLimit;
         var specifiedSkip;
         var activityType;
 
-        for (var prop in query) {
+        for (let prop in query) {
             if (prop === 'limit') {
                 specifiedLimit = parseInt(query.limit, 10);
                 if (isNaN(specifiedLimit) || specifiedLimit < 1) {
@@ -30,7 +30,7 @@ module.exports = {
             }
 
             if (prop === 'verb') {
-                var verbs = query.verb.split(',');
+                let verbs = query.verb.split(',');
                 if (verbs.length === 1) {
                     criteria['verb.id'] = verbs[0];
                 } else if (verbs.length > 1) {
@@ -43,7 +43,7 @@ module.exports = {
             }
 
             if (prop === 'registration') {
-                var registrations = query.registration.split(',');
+                let registrations = query.registration.split(',');
                 if (registrations.length === 1) {
                     criteria['context.registration'] = registrations[0];
                 } else if (registrations.length > 1) {
@@ -59,9 +59,9 @@ module.exports = {
             if (prop === 'agent') {
                 query.agent = JSON.parse(query.agent);
                 if (query.agent.objectType === 'Agent') {
-                    var actorMailToIRI = query.agent.mbox;
+                    let actorMailToIRI = query.agent.mbox;
                     if (actorMailToIRI.indexOf('mailto:') !== 0) {
-                        actorMailToIRI = 'mailto:' + actorMailToIRI;
+                        actorMailToIRI = `mailto:${actorMailToIRI}`;
                     }
                     criteria['actor.mbox'] = actorMailToIRI;
                 }
@@ -73,12 +73,12 @@ module.exports = {
         }
 
         if (activityType && criteria && criteria['verb.id'] && criteria['verb.id'].$in && criteria['verb.id'].$in.length) {
-            var verbArray = criteria['verb.id'].$in;
-            var progressedIndex = verbArray.indexOf(constants.statementsVerbs.progressed);
+            let verbArray = criteria['verb.id'].$in;
+            let progressedIndex = verbArray.indexOf(constants.statementsVerbs.progressed);
             if (progressedIndex !== -1) {
                 verbArray.splice(progressedIndex, 1);
                 delete criteria['verb.id'];
-                criteria['$or'] = [
+                criteria.$or = [
                     {
                         'verb.id': { $in: verbArray }
                     },
@@ -97,10 +97,10 @@ module.exports = {
         }
 
         return {
-            objectId: objectId,
-            criteria: criteria,
-            specifiedLimit: specifiedLimit,
-            specifiedSkip: specifiedSkip
+            objectId,
+            criteria,
+            specifiedLimit,
+            specifiedSkip
         };
     }
 };

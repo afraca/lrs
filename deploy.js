@@ -27,14 +27,14 @@ function transformConfig(configuration) {
 
     switch (configuration) {
     case 'production': {
-        hosts = `hosts: ['live.easygenerator.com', 'beta.easygenerator.com'],`;
+        hosts = 'hosts: [\'live.easygenerator.com\', \'beta.easygenerator.com\'],';
         break;
     }
     default: {
         break;
     }
     }
-    
+
     let defaultData = fs.readFileSync(`${OUTPUT_PATH}/config.js`, 'utf-8');
     let transformedData = defaultData.replace(/hosts: ?\[[\s\S]*\],/, hosts).replace(config.apiKey, apiKey);
     fs.writeFileSync(`${OUTPUT_PATH}/config.js`, transformedData, 'utf-8');

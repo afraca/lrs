@@ -5,19 +5,21 @@ const constants = require('../constants');
 
 const dbhost = (process.env.DBHOST || process.env.IP || '127.0.0.1');
 const dbname = (process.env.DBNAME || 'lrs');
-const url = 'mongodb://' + dbhost + '/' + dbname;
-var db = monk(url, { connectTimeoutMS: constants.dbConnectionTimeout, socketTimeoutMS: constants.dbSocketTimeout });
+const url = `mongodb://${dbhost}/${dbname}`;
+const db = monk(url, {
+    connectTimeoutMS: constants.dbConnectionTimeout, socketTimeoutMS: constants.dbSocketTimeout
+});
 var statements = db.get('statements');
 var results = db.get('results');
 
 const tokensDbHost = (process.env.TOKENS_DBHOST || process.env.IP || '127.0.0.1');
 const tokensDbName = (process.env.TOKENS_DBNAME || 'tokens');
-const tokensUrl = 'mongodb://' + tokensDbHost + '/' + tokensDbName;
+const tokensUrl = `mongodb://${tokensDbHost}/${tokensDbName}`;
 var tokensDb = monk(tokensUrl);
 var tokens = tokensDb.get('accessTokens');
 
 module.exports = {
-    statements: statements,
-    results: results,
-    tokens: tokens
+    statements,
+    results,
+    tokens
 };

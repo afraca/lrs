@@ -2,8 +2,8 @@
 
 const constants = require('../constants');
 
-const courseKey = 'context.extensions.' + constants.courseKey;
-const learningPathKey = 'context.extensions.' + constants.learningPathKey;
+const courseKey = `context.extensions.${constants.courseKey}`;
+const learningPathKey = `context.extensions.${constants.learningPathKey}`;
 
 module.exports = {
     addEntityInfoToQuery(query, entityId, entityType) {

@@ -8,8 +8,8 @@ const command = require('../commands/results');
 module.exports = {
     async update(statement) {
         if (!statementsInformer.isCourseStatement(statement)) { return; }
-        var result = null;
-        var embeded = null;
+        let result = null;
+        let embeded = null;
         if (statementsInformer.isStarted(statement)) {
             result = await command.getAttempt(statement.context.registration);
             if (result) { return; }
@@ -23,20 +23,24 @@ module.exports = {
         } else if (statementsInformer.isObjectiveProgressable(statement)) {
             result = await command.getAttempt(statement.context.registration);
             if (!result) { return; }
-            embeded = result.embeded ? _.find(result.embeded, item => item.objectId === statement.object.id) : null;
+            embeded = result.embeded ?
+                _.find(result.embeded, item => item.objectId === statement.object.id) : null;
             if (!embeded) {
                 embeded = createEmbededResult(statement);
-                var child = await command.getChildStatements(statement.context.registration, statement.object.id);
+                let child = await command.getChildStatements(statement.context.registration,
+                    statement.object.id);
                 applyChildStatements(embeded, child);
                 await command.pushToEmbeded(result._id, embeded);
             } else {
                 await command.pushToEmbededRoot(result._id, embeded.objectId, statement);
             }
             await command.markEmbededAsModified(result._id, embeded.objectId, statement.timestamp);
-        } else if (statementsInformer.isAnswered(statement) || statementsInformer.isExperienced(statement)) {
+        } else if (statementsInformer.isAnswered(statement) ||
+            statementsInformer.isExperienced(statement)) {
             result = await command.getAttempt(statement.context.registration);
             if (!result || !result.embeded) { return; }
-            embeded = _.find(result.embeded, e => _.some(statement.context.contextActivities.parent, parent => parent.id === e.objectId));
+            embeded = _.find(result.embeded, e => _.some(statement.context.contextActivities.parent,
+                parent => parent.id === e.objectId));
             if (!embeded) { return; }
             if (statementsInformer.isAnswered(statement)) {
                 await command.pushToAnswered(result._id, embeded.objectId, statement);
@@ -49,14 +53,14 @@ module.exports = {
 
 function applyChildStatements(source, child) {
     if (!child || !child.length) { return; }
-    for (var i = 0; i < child.length; i++) {
+    for (let i = 0; i < child.length; i++) {
         if (statementsInformer.isAnswered(child[i])) {
             source.answered.push(child[i]);
         } else if (statementsInformer.isExperienced(child[i])) {
             source.experienced.push(child[i]);
         }
     }
-};
+}
 
 function createResult(startedStatement) {
     return {
@@ -67,7 +71,7 @@ function createResult(startedStatement) {
         root: [startedStatement],
         embeded: []
     };
-};
+}
 
 function createEmbededResult(objectiveStatement) {
     return {
@@ -77,4 +81,4 @@ function createEmbededResult(objectiveStatement) {
         answered: [],
         experienced: []
     };
-};
+}
