@@ -65,7 +65,7 @@ module.exports = {
 };
 
 function getJsonStreamWrapperParameters(wrapper) {
-    return [`{"${wrapper}":[', ',', ']}`];
+    return [`{"${wrapper}":[`, ',', ']}'];
 }
 
 function getComparator(dateFieldName) {
