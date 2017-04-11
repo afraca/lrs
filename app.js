@@ -48,6 +48,6 @@ app.use(route.get('/accessTokens', accessTokensRouteHandler.getTokens));
 app.use(route.post('/accessTokens/:tokenId/revoke', accessTokensRouteHandler.revokeToken));
 app.use(route.post('/accessTokens/:tokenId?/enable', accessTokensRouteHandler.enableToken));
 
-var server = http.createServer(app.callback());
+const server = http.createServer(app.callback());
 server.setTimeout(constants.socketLifetime);
 server.listen(process.env.PORT || 3000, process.env.IP);

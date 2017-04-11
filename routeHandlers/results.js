@@ -5,20 +5,22 @@ const queryExtender = require('../helpers/queryExtender');
 const constants = require('../constants');
 const command = require('../commands/results');
 
-const courseKey = 'context.extensions.' + constants.courseKey;
+const courseKey = `context.extensions.${constants.courseKey}`;
 
 module.exports = async ctx => {
     var query = ctx.request.query || {};
     queryExtender.addEntityInfoToQuery(query, ctx.entityId, ctx.entityType);
-    
-    var loadEmbededStatements = query.embeded;
-    var options = queryParser.generateOptions(query, constants.defaultLimit, constants.defaultSkip);
 
-    var stream;
+    let loadEmbededStatements = query.embeded;
+    let options = queryParser.generateOptions(query, constants.defaultLimit, constants.defaultSkip);
+
+    let stream;
     if (loadEmbededStatements) {
-        stream = await command.getFull(options.objectId[courseKey], options.specifiedSkip, options.specifiedLimit);
+        stream = await command.getFull(options.objectId[courseKey],
+            options.specifiedSkip, options.specifiedLimit);
     } else {
-        stream = await command.getRoot(options.objectId[courseKey], options.specifiedSkip, options.specifiedLimit);
+        stream = await command.getRoot(options.objectId[courseKey],
+            options.specifiedSkip, options.specifiedLimit);
     }
 
     if (stream) {

@@ -12,15 +12,15 @@ var fields = {
 };
 
 module.exports = {
-    async getRoot(id, specifiedSkip, specifiedLimit) {
-        return await this.get(Object.assign({}, fields), id, specifiedSkip, specifiedLimit);
+    getRoot(id, specifiedSkip, specifiedLimit) {
+        return this.get(Object.assign({}, fields), id, specifiedSkip, specifiedLimit);
     },
-    async getFull(id, specifiedSkip, specifiedLimit) {
-        return await this.get(Object.assign({ embeded: 1 }, fields), id, specifiedSkip, specifiedLimit);
+    getFull(id, specifiedSkip, specifiedLimit) {
+        return this.get(Object.assign({ embeded: 1 }, fields), id, specifiedSkip, specifiedLimit);
     },
-    async get(fields, id, specifiedSkip, specifiedLimit) {
+    async get(_fields, id, specifiedSkip, specifiedLimit) {
         var cursor = await db.results.find({ id }, {
-            fields,
+            fields: _fields,
             sort: { last_activity: -1 },
             skip: specifiedSkip || constants.defaultSkip,
             limit: specifiedLimit || constants.defaultLimit,
@@ -34,43 +34,44 @@ module.exports = {
     getChildStatements(registration, objectId) {
         return db.statements.find({
             'context.registration': registration,
-            'verb.id': { '$in': [constants.statementsVerbs.answered, constants.statementsVerbs.experienced] },
-            'context.contextActivities.parent.id': { '$in': [objectId] }
+            'verb.id': { $in: [constants.statementsVerbs.answered, constants.statementsVerbs.experienced] },
+            'context.contextActivities.parent.id': { $in: [objectId] }
         });
     },
     insert(result) {
         return db.results.insert(result);
     },
     markRootAsModified(_id, lastActivity) {
-        return db.results.update({ _id }, { '$set': { last_activity: lastActivity } });
+        return db.results.update({ _id }, { $set: { last_activity: lastActivity } });
     },
     markEmbededAsModified(_id, objectId, lastActivity) {
-        return db.results.update({ _id, 'embeded.objectId': objectId }, { '$set': { 'embeded.$.last_activity': lastActivity } });
+        return db.results.update({ _id, 'embeded.objectId': objectId }, { $set: { 'embeded.$.last_activity': lastActivity } });
     },
     pushToRoot(_id, statement) {
-        return db.results.update({ _id }, { '$push': { root: statement } });
+        return db.results.update({ _id }, { $push: { root: statement } });
     },
     pushToEmbeded(_id, embeded) {
-        return db.results.update({ _id }, { '$push': { embeded } });
+        return db.results.update({ _id }, { $push: { embeded } });
     },
     pushToEmbededRoot(_id, objectId, statement) {
-        return db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.root': statement } });
+        return db.results.update({ _id, 'embeded.objectId': objectId }, { $push: { 'embeded.$.root': statement } });
     },
     pushToAnswered(_id, objectId, statement) {
-        return db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.answered': statement } });
+        return db.results.update({ _id, 'embeded.objectId': objectId }, { $push: { 'embeded.$.answered': statement } });
     },
     pushToExperienced(_id, objectId, statement) {
-        return db.results.update({ _id, 'embeded.objectId': objectId }, { '$push': { 'embeded.$.experienced': statement } });
+        return db.results.update({ _id, 'embeded.objectId': objectId }, { $push: { 'embeded.$.experienced': statement } });
     }
 };
 
 function getJsonStreamWrapperParameters(wrapper) {
-    return ['{"' + wrapper + '":[', ',', ']}'];
-};
+    return [`{"${wrapper}":[', ',', ']}`];
+}
 
 function getComparator(dateFieldName) {
-    return (a, b) => ((new Date(a[dateFieldName])).getTime() < (new Date(b[dateFieldName])).getTime()) ? 1 : -1;
-};
+    return (a, b) => ((new Date(a[dateFieldName])).getTime() <
+        (new Date(b[dateFieldName])).getTime()) ? 1 : -1;
+}
 
 function transform(result) {
     if (!result) {
@@ -93,4 +94,4 @@ function transform(result) {
             }
         });
     }
-};
+}

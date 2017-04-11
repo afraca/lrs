@@ -44,7 +44,13 @@ module.exports = {
         if (apiKey === config.apiKey) {
             const owner = ctx.request.body.userEmail;
             if (owner) {
-                await db.tokens.update({ createdBy: owner }, { $set: { revoked: true } }, { multi: true });
+                await db.tokens.update({
+                    createdBy: owner
+                }, {
+                    $set: { revoked: true }
+                }, {
+                    multi: true
+                });
             }
         }
         ctx.body = { success: true };

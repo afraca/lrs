@@ -44,7 +44,7 @@ module.exports = async (ctx, next) => {
         if (issuer === 'localhost') {
             response = { body: { data: constants.accessTypes.academy } };
         } else {
-            response = await httpRequestSender.post('https://' + issuer + path, data, {
+            response = await httpRequestSender.post(`https://${issuer}${path}`, data, {
                 Authorization: `Bearer ${idToken}`
             });
             if (!response || !response.body || response.statusCode !== 200) {
@@ -68,10 +68,8 @@ function isKnownIssuer(issuer) {
             if (knownIssuer.test(issuer)) {
                 return true;
             }
-        } else {
-            if (knownIssuer === issuer) {
-                return true;
-            }
+        } else if (knownIssuer === issuer) {
+            return true;
         }
     }
     return false;

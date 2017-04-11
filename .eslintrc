@@ -1,12 +1,3 @@
 {
-    "rules": {
-        "semi": ["error", "always"],
-        "indent": ["error", 4],
-        "generator-star-spacing": ["error", { "before": false, "after": false }],
-        "eol-last": ["off"],
-        "space-before-function-paren": ["error", "never"],
-        "yield-star-spacing": ["error", "after"],
-        "no-trailing-spaces": ["error", { "skipBlankLines": true }]
-    },
-    "extends": "standard"
+    "extends": ["airbnb-base", "easygenerator"]
 }

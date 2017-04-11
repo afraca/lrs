@@ -8,32 +8,37 @@ module.exports = {
         var moreThanOneAttemptCount = 0;
         var moreThan100AttemptCount = 0;
         var ids = await this.getIds();
-        for (var i = 0; i < ids.length; i++) {
-            var statements = await this.getRootStatements(ids[i]);
-            for (var j = 0; j < statements.length; j++) {
-                var attemptId = statements[j]._id;
+        for (let i = 0; i < ids.length; i++) {
+            let statements = await this.getRootStatements(ids[i]);
+            for (let j = 0; j < statements.length; j++) {
+                let attemptId = statements[j]._id;
                 if (!attemptId) {
                     continue;
                 }
-                var child = await this.getEmbededStatements(statements[j]._id);
+                let child = await this.getEmbededStatements(statements[j]._id);
                 if (!child || !child.length) {
                     continue;
                 }
-                var maxTimestamp = _.max(child, statement => statement.timestamp);
+                let maxTimestamp = _.max(child, statement => statement.timestamp);
                 if (maxTimestamp && maxTimestamp > statements[j].last_activity) {
                     statements[j].last_activity = maxTimestamp;
                 }
 
-                var mastered = this.findStatementGroupById(child, constants.statementsVerbs.mastered);
-                var answered = this.findStatementGroupById(child, constants.statementsVerbs.answered);
-                var experienced = this.findStatementGroupById(child, constants.statementsVerbs.experienced);
-                var progressed = this.findStatementGroupById(child, constants.statementsVerbs.progressed);
+                let mastered = this.findStatementGroupById(child,
+                    constants.statementsVerbs.mastered);
+                let answered = this.findStatementGroupById(child,
+                    constants.statementsVerbs.answered);
+                let experienced = this.findStatementGroupById(child,
+                    constants.statementsVerbs.experienced);
+                let progressed = this.findStatementGroupById(child,
+                    constants.statementsVerbs.progressed);
 
-                statements[j].embeded = this.mapEmbededResults(mastered, progressed, answered, experienced);
+                statements[j].embeded = this.mapEmbededResults(mastered,
+                    progressed, answered, experienced);
             }
-            
-            for (var k = 0; k < statements.length; k++) {
-                var object = statements[k];
+
+            for (let k = 0; k < statements.length; k++) {
+                let object = statements[k];
 
                 object.id = ids[i];
                 object.attempt_id = object._id;
@@ -41,20 +46,20 @@ module.exports = {
                 await db.results.insert(object);
             }
 
-            console.log(i + ' / ' + ids.length);
+            console.log(`${i} / ${ids.length}`);
             if (statements.length > 100) {
                 moreThan100AttemptCount++;
             } else if (statements.length > 1) {
                 moreThanOneAttemptCount++;
             }
         }
-        console.log('Courses with more than 100 attempts: ' + moreThan100AttemptCount);
-        console.log('Courses with more than 1 attempt: ' + moreThanOneAttemptCount);
-        console.log('Total courses: ' + ids.length);
+        console.log(`Courses with more than 100 attempts: ${moreThan100AttemptCount}`);
+        console.log(`Courses with more than 1 attempt: ${moreThanOneAttemptCount}`);
+        console.log(`Total courses: ${ids.length}`);
     },
     async getIds(storeInfile) {
         try {
-            var ids = await db.statements.distinct('context.extensions.http://easygenerator/expapi/course/id');
+            let ids = await db.statements.distinct('context.extensions.http://easygenerator/expapi/course/id');
             if (storeInfile) {
                 await this.writeToFile('migration/tmp_files/ids.json', ids);
             }
@@ -82,16 +87,16 @@ module.exports = {
                             ]
                         },
                         { 'verb.id': { $in: [constants.statementsVerbs.passed, constants.statementsVerbs.failed] } }
-                    ]}
-                ]}
+                    ] }
+                ] }
             },
             { $project: { attemptId: { $ifNull: ['$context.registration', '$_id'] }, statement: '$$ROOT' } },
             { $group: { _id: '$attemptId', last_activity: { $max: '$statement.timestamp' }, first_activity: { $min: '$statement.timestamp' }, root: { $push: '$$ROOT.statement' } } }
         ], { allowDiskUse: true, cursor: { batchSize: 500 } });
         return rootStatements;
     },
-    async getEmbededStatements(attemptId) {
-        return await db.statements.aggregate([
+    getEmbededStatements(attemptId) {
+        return db.statements.aggregate([
             {
                 $match: { $and: [
                     { 'context.registration': attemptId },
@@ -110,7 +115,7 @@ module.exports = {
                             ]
                         }]
                     }
-                ]}
+                ] }
             },
             {
                 $group: {
@@ -135,15 +140,13 @@ module.exports = {
     },
     mapEmbededResults(masteredGroup, progressedGroup, answeredGroup, experiencedGroup) {
         var embededStatements = this.groupEmbededStatements(masteredGroup, progressedGroup);
-        return embededStatements ? _.map(embededStatements, statementGroup => {
-            return {
-                objectId: statementGroup[0].object && statementGroup[0].object.id,
-                last_activity: statementGroup[0].timestamp,
-                root: statementGroup,
-                answered: this.mapChildStatements(answeredGroup, statementGroup[0]),
-                experienced: this.mapChildStatements(experiencedGroup, statementGroup[0])
-            };
-        }) : embededStatements;
+        return embededStatements ? _.map(embededStatements, statementGroup => ({
+            objectId: statementGroup[0].object && statementGroup[0].object.id,
+            last_activity: statementGroup[0].timestamp,
+            root: statementGroup,
+            answered: this.mapChildStatements(answeredGroup, statementGroup[0]),
+            experienced: this.mapChildStatements(experiencedGroup, statementGroup[0])
+        })) : embededStatements;
     },
     groupEmbededStatements(masteredGroup, progressedGroup) {
         var allStatements = null;
@@ -151,44 +154,46 @@ module.exports = {
             allStatements = masteredGroup.statements;
         }
         if (progressedGroup && progressedGroup.statements) {
-            allStatements = allStatements ? allStatements.concat(progressedGroup.statements) : progressedGroup.statements;
+            allStatements = allStatements ?
+                allStatements.concat(progressedGroup.statements) : progressedGroup.statements;
         }
         if (!allStatements) {
             return null;
         }
-        var groupedStatements = [];
-        var statements = allStatements.sort((statement1, statement2) => {
-            var statement1Object = statement1.object || {};
-            var statement2Object = statement2.object || {};
+        let groupedStatements = [];
+        let statements = allStatements.sort((statement1, statement2) => {
+            let statement1Object = statement1.object || {};
+            let statement2Object = statement2.object || {};
             if (statement1Object.id && statement1Object.id === statement2Object.id) {
-                return ((new Date(statement1.timestamp)).getTime() < (new Date(statement2.timestamp)).getTime()) ? 1 : -1;
+                return ((new Date(statement1.timestamp)).getTime() <
+                    (new Date(statement2.timestamp)).getTime()) ? 1 : -1;
             }
             return statement1Object.id ? (statement1Object.id > statement2Object.id) ? 1 : -1 : -1;
         });
-        
+
         groupedStatements.push([statements[0]]);
-        for (var i = 1; i < statements.length; i++) {
-            var groupStatement = groupedStatements[groupedStatements.length - 1][0];
-            var id = statements[i].object && statements[i].object.id;
-            var groupId = groupStatement.object && groupStatement.object.id;
-            
+        for (let i = 1; i < statements.length; i++) {
+            let groupStatement = groupedStatements[groupedStatements.length - 1][0];
+            let id = statements[i].object && statements[i].object.id;
+            let groupId = groupStatement.object && groupStatement.object.id;
+
             if (id && groupId === id) {
                 groupedStatements[groupedStatements.length - 1].push(statements[i]);
             } else {
                 groupedStatements.push([statements[i]]);
             }
         }
-        return _.sortBy(groupedStatements, item => {
-            return -(new Date(item[0].timestamp)).getTime();
-        });
+        return _.sortBy(groupedStatements, item => -(new Date(item[0].timestamp)).getTime());
     },
     mapChildStatements(statementGroup, parentStatement) {
-        return statementGroup && statementGroup.statements ? _.filter(statementGroup.statements, element => {
-            try {
-                return _.some(element.context.contextActivities.parent, item => item.id === parentStatement.object.id);
-            } catch (e) {
-                return false;
-            }
-        }) : null;
+        return statementGroup && statementGroup.statements ?
+            _.filter(statementGroup.statements, element => {
+                try {
+                    return _.some(element.context.contextActivities.parent, item =>
+                        item.id === parentStatement.object.id);
+                } catch (e) {
+                    return false;
+                }
+            }) : null;
     }
 };

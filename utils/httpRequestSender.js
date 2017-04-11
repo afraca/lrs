@@ -6,7 +6,7 @@ module.exports = {
             method: 'POST',
             uri: url,
             body: data,
-            headers: headers,
+            headers,
             json: true,
             resolveWithFullResponse: true
         });
