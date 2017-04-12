@@ -21,7 +21,7 @@
     "del": "^2.2.2",
     "eslint": "^3.19.0",
     "eslint-config-airbnb-base": "^11.1.3",
-    "eslint-config-easygenerator": "^1.0.0",
+    "eslint-config-easygenerator": "^1.0.1",
     "eslint-plugin-import": "^2.2.0",
     "husky": "^0.13.1",
     "ncp": "^2.0.0"
