@@ -12,14 +12,7 @@ const db = monk(url, {
 var statements = db.get('statements');
 var results = db.get('results');
 
-const tokensDbHost = (process.env.TOKENS_DBHOST || process.env.IP || '127.0.0.1');
-const tokensDbName = (process.env.TOKENS_DBNAME || 'tokens');
-const tokensUrl = `mongodb://${tokensDbHost}/${tokensDbName}`;
-var tokensDb = monk(tokensUrl);
-var tokens = tokensDb.get('accessTokens');
-
 module.exports = {
     statements,
-    results,
-    tokens
+    results
 };

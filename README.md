@@ -33,21 +33,6 @@
     db.results.ensureIndex({ "attempt_id" : 1 });
     ```
 
-4. Create "accessTokens" collection within "tokens" DB.
-
-    ```
-    use tokens
-    db.createCollection("accessTokens");
-    ```
-
-5. Create indexes for most frequently used filter properties:
-
-    ```
-    use tokens
-    db.accessTokens.ensureIndex({ "id" : 1 });
-    db.accessTokens.ensureIndex({ "entityId" : 1 });
-    ```
-
 ### Installing website
 1. Clone this Git repository locally
 2. Run `npm install` in the root
@@ -86,7 +71,7 @@
     `nodeProcessCommandLine: node.exe --harmony #full path can be used here as well`
 
 5. Modify `config.js` file for your environment if needed.
-6. Set `CONFIG` environment variable to build for `development` or `production`, `API_KEY` variable to change secret API key, and run `node deploy.js` command to build your package.
+6. Set `CONFIG` environment variable to build for `development` or `production`, `tokensApiKey` variable to change secret API key, and run `node deploy.js` command to build your package.
    By default package will be created at `D:/Applications/lrs` folder.
 
 7. Copy generated package to your server.

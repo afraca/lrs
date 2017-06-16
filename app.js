@@ -14,7 +14,6 @@ const aboutRouteHandler = require('./routeHandlers/about');
 const statementsRouteHandler = require('./routeHandlers/statements');
 const resultsRouteHandler = require('./routeHandlers/results');
 const insertRouteHandler = require('./routeHandlers/insert');
-const accessTokensRouteHandler = require('./routeHandlers/accessTokens');
 
 var app = new Koa();
 app.use(compress());
@@ -35,18 +34,12 @@ app.use(async (ctx, next) => {
     ctx.set(header, config.xApiVersion);
 });
 
-app.use(route.post('/accessTokens/revoke', accessTokensRouteHandler.revokeAllTokens));
-
 app.use(route.post('/xAPI/statements', insertRouteHandler));
 
 app.use(auth);
 
 app.use(route.get('/xAPI/statements', statementsRouteHandler));
 app.use(route.get('/xAPI/results', resultsRouteHandler));
-
-app.use(route.get('/accessTokens', accessTokensRouteHandler.getTokens));
-app.use(route.post('/accessTokens/:tokenId/revoke', accessTokensRouteHandler.revokeToken));
-app.use(route.post('/accessTokens/:tokenId?/enable', accessTokensRouteHandler.enableToken));
 
 const server = http.createServer(app.callback());
 server.setTimeout(constants.socketLifetime);

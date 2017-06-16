@@ -1,26 +1,28 @@
 'use strict';
 
-const decodeJWT = require('jwt-decode');
 const config = require('../config');
-const constants = require('../constants');
-const db = require('../db');
 const httpRequestSender = require('../utils/httpRequestSender');
+const decodeJWT = require('jwt-decode');
+const constants = require('../constants');
 
 module.exports = async (ctx, next) => {
-    if (ctx.originalUrl.indexOf('accessTokens') === -1) {
-        const accessToken = ctx.get('X-Access-Token');
-        if (accessToken) {
-            let info = await db.tokens.findOne({ id: accessToken });
-            if (!info || info.revoked || !info.entityId || !info.entityType || info.scopes.indexOf('read') === -1 || !info.createdBy) {
-                return reject(ctx);
-            }
-            ctx.entityId = info.entityId;
-            ctx.entityType = info.entityType;
-            ctx.identityId = info.createdBy;
-            await next();
-            return;
+    const accessToken = ctx.get('X-Access-Token');
+    if (accessToken) {
+        let info = await httpRequestSender.get(`https://${config.tokens.uri}/${accessToken}`, {
+            'X-Api-Key': config.tokensApiKey
+        });
+
+        if (!info || info.revoked || !info.entityId || !info.entityType || info.scopes.indexOf('read') === -1 || !info.createdBy) {
+            return reject(ctx);
         }
+
+        ctx.entityId = info.entityId;
+        ctx.entityType = info.entityType;
+        ctx.identityId = info.createdBy;
+        await next();
+        return;
     }
+
     const idToken = ctx.get('X-Id-Token');
     const entityId = ctx.get('X-Entity-Id');
     const entityType = ctx.get('X-Entity-Type');

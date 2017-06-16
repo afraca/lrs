@@ -8,5 +8,8 @@ module.exports = {
         coursePath: '/api/course/permissions',
         learningPathPath: '/api/learningpath/permissions'
     },
-    apiKey: 'yourApiKey'
+    tokensApiKey: '76ca5c067d614b419656e83b9f443864',
+    tokens: {
+        uri: 'tokens-staging.easygenerator.com'
+    }
 };

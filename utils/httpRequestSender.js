@@ -10,5 +10,16 @@ module.exports = {
             json: true,
             resolveWithFullResponse: true
         });
+    },
+    async get(url, headers) {
+        var response = await request({
+            method: 'GET',
+            uri: url,
+            headers,
+            json: true,
+            resolveWithFullResponse: true
+        });
+
+        return response.body;
     }
 };
