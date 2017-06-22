@@ -1,1 +1,1 @@
-Set CONFIG=staging&Set API_KEY=%1&npm i&node deploy.js
+Set CONFIG=%1&Set TOKENS_API_KEY=%2&npm i&node deploy.js

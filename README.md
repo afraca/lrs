@@ -71,7 +71,7 @@
     `nodeProcessCommandLine: node.exe --harmony #full path can be used here as well`
 
 5. Modify `config.js` file for your environment if needed.
-6. Set `CONFIG` environment variable to build for `development` or `production`, `tokensApiKey` variable to change secret API key, and run `node deploy.js` command to build your package.
+6. Run `deploy.bat {config} {tokensApiKey}` command to build your package. Where `{config}` - `development` or `production`, and specify `{tokensApiKey}`.
    By default package will be created at `D:/Applications/lrs` folder.
 
 7. Copy generated package to your server.
