@@ -31,13 +31,6 @@ module.exports = {
     getAttempt(attemptId) {
         return db.results.findOne({ attempt_id: attemptId });
     },
-    getChildStatements(registration, objectId) {
-        return db.statements.find({
-            'context.registration': registration,
-            'verb.id': { $in: [constants.statementsVerbs.answered, constants.statementsVerbs.experienced] },
-            'context.contextActivities.parent.id': { $in: [objectId] }
-        });
-    },
     insert(result) {
         return db.results.insert(result);
     },
@@ -51,7 +44,7 @@ module.exports = {
         return db.results.update({ _id }, { $push: { root: statement } });
     },
     pushToEmbeded(_id, embeded) {
-        return db.results.update({ _id }, { $push: { embeded } });
+        return db.results.update({ _id, 'embeded.objectId': { $nin: [embeded.objectId] } }, { $addToSet: { embeded } });
     },
     pushToEmbededRoot(_id, objectId, statement) {
         return db.results.update({ _id, 'embeded.objectId': objectId }, { $push: { 'embeded.$.root': statement } });
