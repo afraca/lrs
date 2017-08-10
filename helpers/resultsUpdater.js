@@ -43,7 +43,8 @@ module.exports = {
             await command.markEmbededAsModified(result._id, embeded.objectId, statement.timestamp);
         } else if (statementsInformer.isAnswered(statement)) {
             let result = await command.getAttempt(statement.context.registration);
-            if (!result || !result.embeded) {
+            if (!result || !result.embeded || !statement.context.contextActivities.parent
+                || !statement.context.contextActivities.parent.length) {
                 return;
             }
 
@@ -60,7 +61,8 @@ module.exports = {
             await command.pushToAnswered(result._id, embeded.objectId, statement);
         } else if (statementsInformer.isExperienced(statement)) {
             let result = await command.getAttempt(statement.context.registration);
-            if (!result || !result.embeded) {
+            if (!result || !result.embeded || !statement.context.contextActivities.grouping
+                || !statement.context.contextActivities.grouping.length) {
                 return;
             }
 
