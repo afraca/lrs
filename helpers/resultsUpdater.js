@@ -67,11 +67,11 @@ module.exports = {
             }
 
             let embeded = _.find(result.embeded,
-                e => _.some(statement.context.contextActivities.grouping,
-                    group => group.id === e.objectId));
+                e => _.some(statement.context.contextActivities.parent,
+                    parent => parent.id === e.objectId));
 
             if (!embeded) {
-                let objectId = statement.context.contextActivities.grouping[0].id;
+                let objectId = statement.context.contextActivities.parent[0].id;
                 embeded = createEmbededResult(objectId, statement.timestamp);
                 await command.pushToEmbeded(result._id, embeded);
             }

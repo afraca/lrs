@@ -22,6 +22,7 @@ module.exports = {
         return statement.verb.id === constants.statementsVerbs.answered;
     },
     isExperienced(statement) {
-        return statement.verb.id === constants.statementsVerbs.experienced;
+        return statement.verb.id === constants.statementsVerbs.experienced &&
+            statement.result && statement.result.score;
     }
 };
