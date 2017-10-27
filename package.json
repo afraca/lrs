@@ -4,6 +4,7 @@
   "description": "lrs ===",
   "main": "app.js",
   "dependencies": {
+    "joi": "^13.0.0",
     "jwt-decode": "^2.1.0",
     "koa": "^2.1.0",
     "koa-bodyparser": "^4.1.0",
@@ -24,12 +25,23 @@
     "eslint-config-easygenerator": "^1.0.1",
     "eslint-plugin-import": "^2.2.0",
     "husky": "^0.13.1",
+    "jasmine": "^2.8.0",
+    "jsonlint-cli": "^1.0.1",
+    "lint-staged": "^4.3.0",
     "ncp": "^2.0.0"
   },
   "scripts": {
-    "precommit": "npm run lint",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "precommit": "lint-staged && npm run test",
+    "test": "node node_modules/jasmine/bin/jasmine.js",
     "lint": "eslint -c .eslintrc ./"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint"
+    ],
+    "*.json": [
+      "jsonlint-cli"
+    ]
   },
   "repository": {
     "type": "git",

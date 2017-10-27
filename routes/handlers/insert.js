@@ -1,7 +1,7 @@
 'use strict';
 
-const db = require('../db');
-const resultsUpdater = require('../helpers/resultsUpdater');
+const db = require('../../db');
+const resultsUpdater = require('../../helpers/resultsUpdater');
 
 module.exports = async ctx => {
     var statement = ctx.request.body;

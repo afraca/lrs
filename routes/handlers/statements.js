@@ -1,9 +1,9 @@
 'use strict';
 
-const queryParser = require('../queryParser');
-const queryExtender = require('../helpers/queryExtender');
-const db = require('../db');
-const constants = require('../constants');
+const queryParser = require('../../queryParser');
+const queryExtender = require('../../helpers/queryExtender');
+const db = require('../../db');
+const constants = require('../../constants');
 
 module.exports = async ctx => {
     var query = ctx.request.query || {};

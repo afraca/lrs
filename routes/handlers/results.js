@@ -1,9 +1,9 @@
 'use strict';
 
-const queryParser = require('../queryParser');
-const queryExtender = require('../helpers/queryExtender');
-const constants = require('../constants');
-const command = require('../commands/results');
+const queryParser = require('../../queryParser');
+const queryExtender = require('../../helpers/queryExtender');
+const constants = require('../../constants');
+const command = require('../../commands/results');
 
 const courseKey = `context.extensions.${constants.courseKey}`;
 

@@ -11,5 +11,6 @@ module.exports = {
     tokensApiKey: 'your_tokens_api_key',
     tokens: {
         uri: 'tokens-staging.easygenerator.com'
-    }
+    },
+    appApiKey: 'your_app_api_key'
 };

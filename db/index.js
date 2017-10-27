@@ -9,10 +9,12 @@ const url = `mongodb://${dbhost}/${dbname}`;
 const db = monk(url, {
     connectTimeoutMS: constants.dbConnectionTimeout, socketTimeoutMS: constants.dbSocketTimeout
 });
+var entityStructures = db.get('entityStructures');
 var statements = db.get('statements');
 var results = db.get('results');
 
 module.exports = {
+    entityStructures,
     statements,
     results
 };
