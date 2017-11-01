@@ -4,7 +4,7 @@ const db = require('../../db');
 const validator = require('../../validation/entityStructureValidator');
 
 module.exports = {
-    post: async ctx => {
+    put: async ctx => {
         let entityStructure = ctx.request.body;
         let error = validator.validate(entityStructure);
         if (error) {

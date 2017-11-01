@@ -29,7 +29,7 @@ Service that stores learners results in xApi format.
     db.statements.createIndex({ "verb.id" : 1});
     db.statements.createIndex({ "context.registration" : 1});
 
-    db.results.createIndex({ "id" : 1, "last_activity": -1 });
+    db.results.createIndex({ "id" : 1, "last_activity": -1, "is_archived": -1 });
     db.results.createIndex({ "attempt_id" : 1 });
 
     db.entityStructures.createIndex({ "entityId" : 1 });

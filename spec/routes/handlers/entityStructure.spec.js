@@ -5,7 +5,7 @@ const validator = require('../../../validation/entityStructureValidator');
 const db = require('../../../db');
 
 describe('route handler [entityStructure]:', () => {
-    describe('post:', () => {
+    describe('put:', () => {
         let ctx = {
             request: {
                 body: null
@@ -19,12 +19,12 @@ describe('route handler [entityStructure]:', () => {
             });
 
             it('should set 400 status', done => (async () => {
-                await handler.post(ctx);
+                await handler.put(ctx);
                 expect(ctx.status).toBe(400);
             })().then(done));
 
             it('should set body error', done => (async () => {
-                await handler.post(ctx);
+                await handler.put(ctx);
                 expect(ctx.body).toBe(error);
             })().then(done));
         });
@@ -46,7 +46,7 @@ describe('route handler [entityStructure]:', () => {
             });
 
             it('should update entity structure in db', done => (async () => {
-                await handler.post(ctx);
+                await handler.put(ctx);
                 expect(db.entityStructures.update).toHaveBeenCalledWith({
                     entityId: structure.entityId,
                     entityType: structure.entityType
@@ -60,12 +60,12 @@ describe('route handler [entityStructure]:', () => {
             })().then(done));
 
             it('should set 200 status', done => (async () => {
-                await handler.post(ctx);
+                await handler.put(ctx);
                 expect(ctx.status).toBe(200);
             })().then(done));
 
             it('should set body message', done => (async () => {
-                await handler.post(ctx);
+                await handler.put(ctx);
                 expect(ctx.body).toEqual({ message: 'OK' });
             })().then(done));
         });
