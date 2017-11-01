@@ -34,25 +34,28 @@ module.exports = {
         }
     },
     archive: async (ctx, attemptId) => {
-        await this._markAttempt(ctx, attemptId, () => command.markAsArchived(attemptId));
+        await markAttempt(ctx, attemptId, () => command.markAsArchived(attemptId));
     },
     unarchive: async (ctx, attemptId) => {
-        await this._markAttempt(ctx, attemptId, () => command.unmarkAsArchived(attemptId));
-    },
-    async _markAttempt(ctx, attemptId, handler) {
-        let attempt = await command.getIdByAttemptId(attemptId);
-        if (!attempt) {
-            ctx.status = 404;
-            ctx.body = { message: 'Attempt with such is has not been found' };
-        }
-
-        if (attempt.id !== ctx.entityId) {
-            ctx.status = 403;
-            ctx.body = { message: 'You dont have permissions for this operation' };
-        }
-
-        handler();
-        ctx.status = 200;
-        ctx.body = { message: 'OK' };
+        await markAttempt(ctx, attemptId, () => command.unmarkAsArchived(attemptId));
     }
 };
+
+async function markAttempt(ctx, attemptId, handler) {
+    let attempt = await command.getIdByAttemptId(attemptId);
+    if (!attempt) {
+        ctx.status = 404;
+        ctx.body = { message: 'Attempt with such id has not been found' };
+        return;
+    }
+
+    if (attempt.id !== ctx.entityId) {
+        ctx.status = 403;
+        ctx.body = { message: 'You dont have permissions for this operation' };
+        return;
+    }
+
+    handler();
+    ctx.status = 200;
+    ctx.body = { message: 'OK' };
+}
