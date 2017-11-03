@@ -27,5 +27,11 @@ module.exports = {
     },
     accessTypes: {
         academy: 3
+    },
+    request: {
+        allowedHeaders: 'X-Experience-API-Version,X-Access-Token,X-Id-Token,X-Entity-Id,X-Entity-Type,Accept,Authorization,Content-Type,If-Match,If-None-Match'
+    },
+    errors: {
+        internalServerError: 'Something went wrong'
     }
 };

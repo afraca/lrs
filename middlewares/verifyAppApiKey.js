@@ -2,13 +2,11 @@
 
 const config = require('../config');
 
-module.exports = async (ctx, next) => {
-    const apiKey = ctx.get('X-API-Key');
-
-    if (apiKey === config.appApiKey) {
+module.exports = async (req, res, next) => {
+    const header = 'X-API-Key';
+    if (req.get(header) === config.appApiKey) {
         await next();
     } else {
-        ctx.body = 'Access denied. Invalid \'X-API-Key\' header was supplied';
-        ctx.status = 403;
+        res.status(403).send('Invalid \'X-Analytics-API-Key\' header was supplied');
     }
 };

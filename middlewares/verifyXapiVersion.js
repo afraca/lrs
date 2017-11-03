@@ -2,13 +2,14 @@
 
 const config = require('../config');
 
-module.exports = async (ctx, next) => {
+module.exports = async (req, res, next) => {
     const header = 'X-Experience-API-Version';
-    if (ctx.get(header) && ctx.get(header).substring(0, 3) === config.xApiVersion.substring(0, 3)) {
+    let expectedXApiVersion = config.xApiVersion.substring(0, 3);
+    if (req.get(header) && req.get(header).substring(0, 3) === expectedXApiVersion) {
         await next();
     } else {
-        ctx.body = 'Invalid \'X-Experience-API-Version\' header was supplied';
-        ctx.status = 400;
+        res.set(header, config.xApiVersion)
+            .status(400)
+            .send('Invalid \'X-Experience-API-Version\' header was supplied');
     }
-    ctx.set(header, config.xApiVersion);
 };

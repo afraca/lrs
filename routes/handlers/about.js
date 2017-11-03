@@ -2,9 +2,8 @@
 
 const config = require('../../config');
 
-module.exports = ctx => {
-    ctx.body = {
+module.exports = async (req, res) => {
+    res.status(200).json({
         version: config.xApiVersion
-    };
-    ctx.status = 200;
+    });
 };

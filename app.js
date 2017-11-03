@@ -1,22 +1,27 @@
 'use strict';
 
-const http = require('http');
-const Koa = require('koa');
-const bodyParser = require('koa-bodyparser');
-const logger = require('koa-logger');
-const compress = require('koa-compress');
-const cors = require('./middlewares/cors');
+const express = require('express');
+const cors = require('cors');
+const compression = require('compression');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
 const constants = require('./constants');
+const errorHandler = require('./middlewares/errorHandler');
 const routes = require('./routes');
 
-var app = new Koa();
-app.use(compress());
-app.use(cors);
-app.use(logger());
-app.use(bodyParser());
+let app = express();
 
-routes.init(app);
+app.use(morgan('combined'));
+app.use(compression());
+app.use(cors({
+    allowedHeaders: constants.request.allowedHeaders
+}));
+app.use(bodyParser.json());
+app.use(routes);
+app.use(errorHandler);
 
-const server = http.createServer(app.callback());
+let server = app.listen(process.env.PORT || 3000, () => {
+    console.log(`Server started on port ${server.address().port}`);
+});
+
 server.setTimeout(constants.socketLifetime);
-server.listen(process.env.PORT || 3000, process.env.IP);

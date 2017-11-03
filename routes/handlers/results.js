@@ -8,9 +8,9 @@ const command = require('../../commands/results');
 const courseKey = `context.extensions.${constants.courseKey}`;
 
 module.exports = {
-    get: async ctx => {
-        var query = ctx.request.query || {};
-        queryExtender.addEntityInfoToQuery(query, ctx.entityId, ctx.entityType);
+    get: async (req, res) => {
+        var query = req.query || {};
+        queryExtender.addEntityInfoToQuery(query, req.entityId, req.entityType);
 
         let loadEmbededStatements = query.embeded;
         let options = queryParser.generateOptions(query,
@@ -28,34 +28,31 @@ module.exports = {
         }
 
         if (stream) {
-            ctx.status = 200;
-            ctx.type = 'application/json';
-            ctx.body = stream;
+            res.body = stream;
+            res.status(200);
         }
     },
-    archive: async (ctx, attemptId) => {
-        await markAttempt(ctx, attemptId, () => command.markAsArchived(attemptId));
+    archive: async (req, res) => {
+        await markAttempt(req, res, command.markAsArchived);
     },
-    unarchive: async (ctx, attemptId) => {
-        await markAttempt(ctx, attemptId, () => command.unmarkAsArchived(attemptId));
+    unarchive: async (req, res) => {
+        await markAttempt(req, res, command.unmarkAsArchived);
     }
 };
 
-async function markAttempt(ctx, attemptId, handler) {
+async function markAttempt(req, res, handler) {
+    let attemptId = req.params.attemptId;
     let attempt = await command.getIdByAttemptId(attemptId);
     if (!attempt) {
-        ctx.status = 404;
-        ctx.body = { message: 'Attempt with such id has not been found' };
+        res.status(404).json({ message: 'Attempt with such id has not been found' });
         return;
     }
 
-    if (attempt.id !== ctx.entityId) {
-        ctx.status = 403;
-        ctx.body = { message: 'You dont have permissions for this operation' };
+    if (attempt.id !== req.entityId) {
+        res.status(403).json({ message: 'You dont have permissions for this operation' });
         return;
     }
 
-    handler();
-    ctx.status = 200;
-    ctx.body = { message: 'OK' };
+    handler(attemptId);
+    res.status(200).json({ message: 'OK' });
 }

@@ -1,30 +1,28 @@
 'use strict';
 
-const route = require('koa-route');
+const express = require('express');
 const auth = require('../middlewares/auth');
+const idTokenAuth = require('../middlewares/idTokenAuth');
 const verifyXapiVersion = require('../middlewares/verifyXapiVersion');
 const verifyAppApiKey = require('../middlewares/verifyAppApiKey');
 const about = require('./handlers/about');
 const statements = require('./handlers/statements');
 const results = require('./handlers/results');
 const entityStructure = require('./handlers/entityStructure');
+const run = require('../errorHandling/asyncRunner');
 
-module.exports = {
-    init: app => {
-        app.use(route.get('/xAPI/about', about));
-        app.use(route.post('/entity/structure', verifyAppApiKey));
-        app.use(route.post('/entity/structure', entityStructure.put));
+var router = express.Router();
+router.get('/xAPI/about', run(about));
+router.post('/entity/structure', run(verifyAppApiKey), run(entityStructure.put));
 
-        app.use(verifyXapiVersion);
+router.use(run(verifyXapiVersion));
+router.post('/xAPI/statements', run(statements.post));
+router.post('/xAPI/results/archive/:attemptId', run(idTokenAuth), run(results.archive));
+router.post('/xAPI/results/unarchive/:attemptId', run(idTokenAuth), run(results.unarchive));
 
-        app.use(route.post('/xAPI/statements', statements.post));
+router.use(run(auth));
+router.get('/xAPI/statements', run(statements.get));
+router.get('/xAPI/results', run(results.get));
+router.get('/entity/structure', run(entityStructure.get));
 
-        app.use(auth);
-
-        app.use(route.get('/xAPI/statements', statements.get));
-        app.use(route.get('/xAPI/results', results.get));
-        app.use(route.post('/xAPI/results/archive/:attemptId', results.archive));
-        app.use(route.post('/xAPI/results/unarchive/:attemptId', results.unarchive));
-        app.use(route.get('/entity/structure', entityStructure.get));
-    }
-};
+module.exports = router;

@@ -7,8 +7,8 @@ const constants = require('../../constants');
 const resultsUpdater = require('../../helpers/resultsUpdater');
 
 module.exports = {
-    post: async ctx => {
-        var statement = ctx.request.body;
+    post: async (req, res) => {
+        var statement = req.body;
         await db.statements.insert(statement);
         if (statement.length) {
             for (let i = 0; i < statement.length; i++) {
@@ -17,11 +17,11 @@ module.exports = {
         } else {
             await resultsUpdater.update(statement);
         }
-        ctx.status = 200;
+        res.status(200).send();
     },
-    get: async ctx => {
-        var query = ctx.request.query || {};
-        queryExtender.addEntityInfoToQuery(query, ctx.entityId, ctx.entityType);
+    get: async (req, res) => {
+        var query = req.query || {};
+        queryExtender.addEntityInfoToQuery(query, req.entityId, req.entityType);
 
         let options = queryParser.generateOptions(
             query,
@@ -37,8 +37,7 @@ module.exports = {
         });
 
         if (statements) {
-            ctx.status = 200;
-            ctx.body = { statements };
+            res.status(200).json(statements);
         }
     }
 };
