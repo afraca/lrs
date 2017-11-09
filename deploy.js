@@ -12,7 +12,7 @@ const ignore = ['.vscode', '.git', 'migration', '.gitignore', '.eslintrc', 'pack
 del.sync([`${OUTPUT_PATH}/**`], { force: true });
 fs.mkdirSync(OUTPUT_PATH);
 
-let configuration = process.env.CONFIG || 'development';
+let configuration = process.env.CONFIG || 'staging';
 
 ncp('./', OUTPUT_PATH, {
     filter: file => !file.includes('node_modules')
@@ -38,7 +38,7 @@ function transformConfig() {
     let data = fs.readFileSync(`${OUTPUT_PATH}/config.js`, 'utf-8');
 
     switch (configuration) {
-    case 'production':
+    case 'live':
         {
             data = data.replace(/hosts: ?\[[\s\S]*\],/, 'hosts: [\'live.easygenerator.com\', \'beta.easygenerator.com\'],');
             data = data.replace('tokens-staging.easygenerator.com', 'tokens.easygenerator.com');

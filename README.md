@@ -29,7 +29,7 @@ Service that stores learners results in xApi format.
     db.statements.createIndex({ "verb.id" : 1});
     db.statements.createIndex({ "context.registration" : 1});
 
-    db.results.createIndex({ "id" : 1, "last_activity": -1 });
+    db.results.createIndex({ "id" : 1, "last_activity": -1, "is_archived": -1 });
     db.results.createIndex({ "attempt_id" : 1 });
 
     db.entityStructures.createIndex({ "entityId" : 1 });
@@ -54,6 +54,6 @@ Run eslint coding style tests `npm run lint`.
 2. Modify `config.js` file if needed.
 3. To build the deployment package run
   ```
-    deploy.bat {config [development|production]} {tokensApiKey} {appApiKey}
+    deploy.bat {config [staging|live]} {tokensApiKey} {appApiKey}
   ```
 By default package will be created at `D:/Applications/lrs` folder.

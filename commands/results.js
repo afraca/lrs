@@ -19,7 +19,10 @@ module.exports = {
         return this.get(Object.assign({ embeded: 1 }, fields), id, specifiedSkip, specifiedLimit);
     },
     async get(_fields, id, specifiedSkip, specifiedLimit) {
-        var cursor = await db.results.find({ id }, {
+        var cursor = await db.results.find({
+            id,
+            is_archived: { $ne: true }
+        }, {
             fields: _fields,
             sort: { last_activity: -1 },
             skip: specifiedSkip || constants.defaultSkip,
@@ -31,8 +34,17 @@ module.exports = {
     getAttempt(attemptId) {
         return db.results.findOne({ attempt_id: attemptId });
     },
+    getIdByAttemptId(attemptId) {
+        return db.results.findOne({ attempt_id: attemptId }, { fields: { id: 1 } });
+    },
     insert(result) {
         return db.results.insert(result);
+    },
+    markAsArchived(attemptId) {
+        return db.results.update({ attempt_id: attemptId }, { $set: { is_archived: true } });
+    },
+    unmarkAsArchived(attemptId) {
+        return db.results.update({ attempt_id: attemptId }, { $set: { is_archived: false } });
     },
     markRootAsModified(_id, lastActivity) {
         return db.results.update({ _id }, { $set: { last_activity: lastActivity } });
