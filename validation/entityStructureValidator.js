@@ -15,7 +15,8 @@ module.exports = {
                     title: joi.string().required(),
                     questions: joi.array().items(joi.object({
                         id: joi.string().required(),
-                        title: joi.string().required()
+                        title: joi.string().required(),
+                        type: joi.string().required()
                     })).required()
                 })).required()
             }).required()
