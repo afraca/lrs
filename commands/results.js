@@ -12,21 +12,40 @@ var fields = {
 };
 
 module.exports = {
-    getRoot(id, specifiedSkip, specifiedLimit) {
-        return this.get(Object.assign({}, fields), id, specifiedSkip, specifiedLimit);
+    getRoot(id, specifiedSkip, specifiedLimit, since, until) {
+        return this.get(Object.assign({}, fields), id,
+            specifiedSkip, specifiedLimit, since, until);
     },
-    getFull(id, specifiedSkip, specifiedLimit) {
-        return this.get(Object.assign({ embeded: 1 }, fields), id, specifiedSkip, specifiedLimit);
+    getFull(id, specifiedSkip, specifiedLimit, since, until) {
+        return this.get(Object.assign({ embeded: 1 }, fields), id,
+            specifiedSkip, specifiedLimit, since, until);
     },
-    async get(_fields, id, specifiedSkip, specifiedLimit) {
-        var cursor = await db.results.find({
-            id,
-            is_archived: { $ne: true }
-        }, {
+    async get(_fields, id, specifiedSkip, specifiedLimit, since, until) {
+        let criteria = { id, is_archived: { $ne: true } };
+
+        if (since) {
+            criteria.last_activity = { $gte: since };
+        }
+
+        if (until) {
+            if (!criteria.last_activity) {
+                criteria.last_activity = {};
+            }
+            criteria.last_activity.$lte = until;
+        }
+
+        let skip;
+        let limit;
+        if (!criteria.last_activity) {
+            skip = specifiedSkip || constants.defaultSkip;
+            limit = specifiedLimit || constants.defaultLimit;
+        }
+
+        let cursor = await db.results.find(criteria, {
             fields: _fields,
             sort: { last_activity: -1 },
-            skip: specifiedSkip || constants.defaultSkip,
-            limit: specifiedLimit || constants.defaultLimit,
+            skip,
+            limit,
             rawCursor: true
         });
         return cursor.stream().pipe(jsonStream.stringify(transform).apply(this, getJsonStreamWrapperParameters('statements')));

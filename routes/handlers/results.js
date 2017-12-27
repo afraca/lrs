@@ -13,6 +13,7 @@ module.exports = {
         queryExtender.addEntityInfoToQuery(query, ctx.entityId, ctx.entityType);
 
         let loadEmbededStatements = query.embeded;
+
         let options = queryParser.generateOptions(query,
             constants.defaultLimit,
             constants.defaultSkip
@@ -21,10 +22,10 @@ module.exports = {
         let stream;
         if (loadEmbededStatements) {
             stream = await command.getFull(options.objectId[courseKey],
-                options.specifiedSkip, options.specifiedLimit);
+                options.specifiedSkip, options.specifiedLimit, options.since, options.until);
         } else {
             stream = await command.getRoot(options.objectId[courseKey],
-                options.specifiedSkip, options.specifiedLimit);
+                options.specifiedSkip, options.specifiedLimit, options.since, options.until);
         }
 
         if (stream) {

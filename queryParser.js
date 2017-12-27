@@ -1,14 +1,16 @@
 'use strict';
 
-var constants = require('./constants');
+const constants = require('./constants');
 
 module.exports = {
     generateOptions(query, defaultLimit, defaultSkip) {
-        var objectId = {};
-        var criteria = {};
-        var specifiedLimit;
-        var specifiedSkip;
-        var activityType;
+        let objectId = {};
+        let criteria = {};
+        let specifiedLimit;
+        let specifiedSkip;
+        let activityType;
+        let since;
+        let until;
 
         for (let prop in query) {
             if (prop === 'limit') {
@@ -23,6 +25,14 @@ module.exports = {
                 if (isNaN(specifiedSkip) || specifiedLimit < 0) {
                     specifiedSkip = defaultSkip;
                 }
+            }
+
+            if (prop === 'since') {
+                since = !isNaN(Date.parse(query.since)) ? query.since : null;
+            }
+
+            if (prop === 'until') {
+                until = !isNaN(Date.parse(query.until)) ? query.until : null;
             }
 
             if (prop === 'type') {
@@ -100,7 +110,9 @@ module.exports = {
             objectId,
             criteria,
             specifiedLimit,
-            specifiedSkip
+            specifiedSkip,
+            since,
+            until
         };
     }
 };
