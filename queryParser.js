@@ -11,6 +11,7 @@ module.exports = {
         let activityType;
         let since;
         let until;
+        let cultures;
 
         for (let prop in query) {
             if (prop === 'limit') {
@@ -59,6 +60,10 @@ module.exports = {
                 } else if (registrations.length > 1) {
                     criteria['context.registration'] = { $in: registrations };
                 }
+            }
+
+            if (prop === 'cultures') {
+                cultures = query.cultures.split(',');
             }
 
             if (prop.indexOf('context.extensions.') === 0) {
@@ -112,7 +117,8 @@ module.exports = {
             specifiedLimit,
             specifiedSkip,
             since,
-            until
+            until,
+            cultures
         };
     }
 };

@@ -1,6 +1,11 @@
 'use strict';
 
 module.exports = {
+    emailRegex: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+    extensions: {
+        survey: 'http://easygenerator/expapi/question/survey',
+        questionType: 'http://easygenerator/expapi/question/type'
+    },
     socketLifetime: 300000,
     dbConnectionTimeout: 60000,
     dbSocketTimeout: 300000,
@@ -27,5 +32,24 @@ module.exports = {
     },
     accessTypes: {
         academy: 3
+    },
+    questionTypes: {
+        informationContent: 'informationContent',
+        singleSelectText: 'singleSelectText',
+        singleSelectImage: 'singleSelectImage',
+        multipleSelect: 'multipleSelect',
+        dragAndDropText: 'dragAndDropText',
+        statement: 'statement',
+        textMatching: 'textMatching',
+        rankingText: 'rankingText',
+        fillInTheBlank: 'fillInTheBlank',
+        openQuestion: 'openQuestion',
+        hotspot: 'hotspot',
+        scenario: 'scenario'
+    },
+    csv: {
+        defaultValue: '-',
+        sectionMark: 'S:',
+        questionMark: 'Q:'
     }
 };

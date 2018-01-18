@@ -1,0 +1,1 @@
+easyresources generate -w "Reports service" --useDefaultLocalizationWhenNoTranslation 1 -o "../localization/lang" -e "RU"

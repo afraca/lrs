@@ -6,6 +6,7 @@ const constants = require('../../constants');
 const command = require('../../commands/results');
 
 const courseKey = `context.extensions.${constants.courseKey}`;
+const learningPathKey = `context.extensions.${constants.learningPathKey}`;
 
 module.exports = {
     get: async ctx => {
@@ -13,16 +14,24 @@ module.exports = {
         queryExtender.addEntityInfoToQuery(query, ctx.entityId, ctx.entityType);
 
         let loadEmbededStatements = query.embeded;
-
+        let csv = query.csv;
         let options = queryParser.generateOptions(query,
             constants.defaultLimit,
             constants.defaultSkip
         );
-
+        let contentType = 'application/json';
         let stream;
-        if (loadEmbededStatements) {
-            stream = await command.getFull(options.objectId[courseKey],
-                options.specifiedSkip, options.specifiedLimit, options.since, options.until);
+
+        if (query.csv) {
+            let isCourseResult = ctx.entityType === constants.entityTypes.course;
+            let idKey = isCourseResult ? courseKey : learningPathKey;
+            stream = await command.getCsv(options.objectId[idKey], isCourseResult,
+                options.specifiedSkip, options.specifiedLimit, options.since,
+                options.until, csv, options.cultures);
+            contentType = 'text/csv';
+        } else if (loadEmbededStatements) {
+            stream = await command.getFull(options.objectId[courseKey], options.specifiedSkip,
+                options.specifiedLimit, options.since, options.until);
         } else {
             stream = await command.getRoot(options.objectId[courseKey],
                 options.specifiedSkip, options.specifiedLimit, options.since, options.until);
@@ -30,7 +39,7 @@ module.exports = {
 
         if (stream) {
             ctx.status = 200;
-            ctx.type = 'application/json';
+            ctx.type = contentType;
             ctx.body = stream;
         }
     },
