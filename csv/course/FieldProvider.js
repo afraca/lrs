@@ -16,13 +16,13 @@ module.exports = class CourseFieldProvider extends FieldProvider {
 
         structure.sections.forEach((section, sectionIndex) => {
             fields.push(this._getField(
-                `${sectionShortTitle}${sectionIndex + 1}: ${section.title}`.replace(/[,]/g, '","'),
+                `${sectionShortTitle}${sectionIndex + 1}: ${section.title}`,
                 `details.${consts.csv.sectionMark}${section.id}`
             ));
 
             section.questions.forEach((question, questionIndex) => {
                 fields.push(this._getField(
-                    `${sectionShortTitle}${sectionIndex + 1} ${question.type === 'informationContent' ? contentShortTitle : questionShortTitle}${questionIndex + 1}: ${question.title}`.replace(/[,]/g, '","'),
+                    `${sectionShortTitle}${sectionIndex + 1} ${question.type === 'informationContent' ? contentShortTitle : questionShortTitle}${questionIndex + 1}: ${question.title}`,
                     `details.${consts.csv.questionMark}${question.id}score`
                 ));
                 fields.push(this._getField(
