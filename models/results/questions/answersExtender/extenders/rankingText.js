@@ -19,10 +19,10 @@ module.exports = function (statement) {
             choice.description['en-US'], choice.description['en-US']
         ));
     } else {
-        this.answers = _.map(choices, (choice, index) => new RankingTextAnswer(
-            choice.description['en-US'],
-            correctResponsesPatternIds[index]
-        ));
+        this.answers = _.map(responseIds, (id, index) => {
+            let choice = _.find(choices, c => c.id.toLowerCase() === id.toLowerCase());
+            return new RankingTextAnswer(choice.description['en-US'], correctResponsesPatternIds[index]);
+        });
     }
     this.isAnswered = !!_.find(this.answers, answer => !answer.isSameValues);
     this.response = _.map(this.answers, answer => answer.answeredTitle).join('; ');
