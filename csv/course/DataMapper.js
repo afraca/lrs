@@ -74,7 +74,8 @@ module.exports = class CourseDataMapper extends DataMapper {
 
             return question.hasResponse ? question.response
                 : this.staticTexts.reportingInfoNotAvailable;
-        } else if (question.questionType === constants.questionTypes.informationContent) {
+        } else if (!question.questionType ||
+                    question.questionType === constants.questionTypes.informationContent) {
             return this.staticTexts.reportingInfoNotAvailable;
         }
 

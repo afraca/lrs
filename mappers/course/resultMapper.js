@@ -140,5 +140,5 @@ function map(startedStatement, progressedStatement, sectionsStatements, localiza
 }
 
 function mapStatements(statements) {
-    return statements.map(statement => new Statement(statement));
+    return _.map(statements, statement => new Statement(statement));
 }
