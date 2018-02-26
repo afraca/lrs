@@ -1,20 +1,17 @@
 'use strict';
 
-const monk = require('monk');
-const constants = require('../constants');
+const MongoClient = require('mongodb').MongoClient;
 
-const dbhost = (process.env.DBHOST || process.env.IP || '127.0.0.1');
-const dbname = (process.env.DBNAME || 'lrs');
-const url = `mongodb://${dbhost}/${dbname}`;
-const db = monk(url, {
-    connectTimeoutMS: constants.dbConnectionTimeout, socketTimeoutMS: constants.dbSocketTimeout
-});
-var entityStructures = db.get('entityStructures');
-var statements = db.get('statements');
-var results = db.get('results');
-
-module.exports = {
-    entityStructures,
-    statements,
-    results
+const instance = {
+    connect: (connection, dbName) =>
+        MongoClient.connect(connection).then(client => {
+            instance.entityStructures = client.db(dbName).collection('entrityStructures');
+            instance.statements = client.db(dbName).collection('statements');
+            instance.results = client.db(dbName).collection('results');
+        }),
+    entityStructures: undefined,
+    statements: undefined,
+    results: undefined
 };
+
+module.exports = instance;

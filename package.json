@@ -13,7 +13,7 @@
     "koa-router": "^7.2.1",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
-    "monk": "^4.0.0",
+    "mongodb": "^3.0.3",
     "request": "^2.81.0",
     "request-promise": "^4.1.1",
     "through": "^2.3.8",
@@ -34,8 +34,9 @@
     "ncp": "^2.0.0"
   },
   "scripts": {
+    "start": "node app.js",
     "precommit": "lint-staged && npm run test",
-    "test": "node node_modules/jasmine/bin/jasmine.js",
+    "test": "node ./jasmine.js",
     "lint": "eslint -c .eslintrc ./"
   },
   "lint-staged": {

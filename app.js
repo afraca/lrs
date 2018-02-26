@@ -9,12 +9,13 @@ const cors = require('./middlewares/cors');
 const logging = require('./middlewares/logging');
 const constants = require('./constants');
 const router = require('./routes');
-
-var app = new Koa();
+const db = require('./db');
 
 const logger = new winston.Logger({
     transports: [new winston.transports.Console({ json: false, timestamp: true, level: 'warn' })]
 });
+
+var app = new Koa();
 
 app.use(compress());
 app.use(cors);
@@ -25,4 +26,14 @@ app.use(router.routes());
 const server = http.createServer(app.callback());
 server.setTimeout(constants.socketLifetime);
 
-server.listen(process.env.PORT || 3000, process.env.IP);
+const dbhost = process.env.DBHOST || process.env.IP || '127.0.0.1';
+const dbname = process.env.DBNAME || 'lrs';
+const connectionString = `mongodb://${dbhost}`;
+
+db
+    .connect(connectionString, dbname)
+    .then(() => server.listen(process.env.PORT || 3000, process.env.IP))
+    .catch(e => {
+        logger.error(e);
+        process.exit(1);
+    });

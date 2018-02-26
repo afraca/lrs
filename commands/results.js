@@ -94,8 +94,7 @@ module.exports = {
             fields: _fields,
             sort: { last_activity: -1 },
             skip,
-            limit,
-            rawCursor: true
+            limit
         });
     },
     _getLearningPathResultsCursor(criteria, skip, limit) {
@@ -103,8 +102,7 @@ module.exports = {
             limit,
             skip,
             sort: { timestamp: -1 },
-            fields: { _id: 0 },
-            rawCursor: true
+            fields: { _id: 0 }
         });
     },
     _getCourseCriteria(id, specifiedSkip, specifiedLimit, since, until) {
