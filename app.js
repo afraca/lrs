@@ -26,12 +26,15 @@ app.use(router.routes());
 const server = http.createServer(app.callback());
 server.setTimeout(constants.socketLifetime);
 
-const dbhost = process.env.DBHOST || process.env.IP || '127.0.0.1';
-const dbname = process.env.DBNAME || 'lrs';
-const connectionString = `mongodb://${dbhost}`;
+const url = `mongodb://${process.env.DBHOST || process.env.IP || '127.0.0.1'}`;
+const dbName = process.env.DBNAME || 'lrs';
+const options = {
+    connectTimeoutMS: process.env.DBCONNECTIONTIMEOUT || 60000,
+    socketTimeoutMS: process.env.DBSOCKETTIMEOUT || 300000
+};
 
 db
-    .connect(connectionString, dbname)
+    .connect(url, dbName, options)
     .then(() => server.listen(process.env.PORT || 3000, process.env.IP))
     .catch(e => {
         logger.error(e);
