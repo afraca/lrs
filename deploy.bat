@@ -1,1 +1,0 @@
-Set CONFIG=%1&Set TOKENS_API_KEY=%2&&Set APP_API_KEY=%3&npm i&node deploy.js

@@ -1,0 +1,67 @@
+version: 2.0
+
+jobs:
+  build:
+    machine: true
+    working_directory: ~/lrs
+    steps:
+      - checkout
+      - run:
+          name: Dump Docker credentials to file
+          command: |
+            echo $TLSCACERT | base64 --decode --ignore-garbage > ${HOME}/ca.pem
+            echo $TLSKEY | base64 --decode --ignore-garbage > ${HOME}/key.pem
+            echo $TLSCERT | base64 --decode --ignore-garbage > ${HOME}/cert.pem
+
+      - run:
+          name: Build Docker image
+          command: docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem  -H $DOCKER_HOST build . -t lrs:$CIRCLE_BRANCH
+      
+
+  deploy-staging:
+    machine: true
+    working_directory: ~/lrs
+    steps:
+      - run:
+          name: Dump Docker Credentials to file
+          command: |
+            echo $TLSCACERT | base64 --decode --ignore-garbage > ${HOME}/ca.pem
+            echo $TLSKEY | base64 --decode --ignore-garbage > ${HOME}/key.pem
+            echo $TLSCERT | base64 --decode --ignore-garbage > ${HOME}/cert.pem
+
+      - run:
+          name: Run Docker container
+          command: |
+            docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $DOCKER_HOST inspect lrs-$CIRCLE_BRANCH &> /dev/null && \
+              docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $DOCKER_HOST stop lrs-$CIRCLE_BRANCH && \
+              docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $DOCKER_HOST rm lrs-$CIRCLE_BRANCH
+
+            docker \
+              --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem \
+              -H $DOCKER_HOST \
+              run \
+              -d \
+              --name lrs-$CIRCLE_BRANCH \
+              --env VIRTUAL_HOST="$STAGING_VIRTUAL_HOST" \
+              --env DBHOST="$STAGING_DBHOST" \
+              --env LOG_LEVEL="verbose" \
+              --env TOKENS_URI="$STAGING_TOKENS_URI" \
+              --env TOKENS_API_KEY="$STAGING_TOKENS_API_KEY" \
+              --env APP_API_KEY="$STAGING_APP_API_KEY" \
+              --env PERMISSIONS_ENDPOINT_HOSTS="staging.easygenerator.com" \
+              --restart on-failure \
+              lrs:$CIRCLE_BRANCH
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy-staging:
+          requires:
+            - build
+          filters:
+            # branches:
+            #   only: master
+            tags:
+              ignore: /^v.*/

@@ -7,7 +7,7 @@ const idTokenAuth = require('./idTokenAuth');
 module.exports = async (ctx, next) => {
     const accessToken = ctx.get('X-Access-Token');
     if (accessToken) {
-        let info = await httpRequestSender.get(`https://${config.tokens.uri}/${accessToken}`, {
+        let info = await httpRequestSender.get(`https://${config.tokensUri}/${accessToken}`, {
             'X-Api-Key': config.tokensApiKey
         });
 

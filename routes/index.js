@@ -11,6 +11,7 @@ const results = require('./handlers/results');
 const entityStructure = require('./handlers/entityStructure');
 
 router.get('/xAPI/about', about);
+
 router.post('/entity/structure', verifyAppApiKey, entityStructure.put);
 router.get('/entity/structure', auth, entityStructure.get);
 

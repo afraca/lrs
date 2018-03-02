@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+
+  api:
+    build: .
+    environment:
+      - LOG_LEVEL=verbose
+      - NODE_ENV=development
+      - DBHOST=db
+    expose:
+      - 3000
+    ports:
+      - 3000:3000
+    links:
+      - db
+    depends_on:
+      - db
+
+  db:
+    image: mongo:latest
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    ports:
+      - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet

@@ -6,7 +6,7 @@ Service that stores learners results in xApi format.
 
 ### Prerequisites
 
-1. Install NodeJS v7.x.
+1. Install NodeJS v8.x.
 2. Install MongoDB v3.4 (or latest).
 
 ### Configuring database
@@ -41,8 +41,25 @@ Service that stores learners results in xApi format.
 
 1. Clone the repository locally.
 2. Run npm install.
-3. Configure environment variables `config.js` file if needed.
-4. Run application. You can use vscode command `Launch Program`.
+3. Configure environment variables. 
+```
+  LOG_LEVEL (default: warn)
+  PORT (default: 3000)
+
+  DBHOST (default: 127.0.0.1) 
+  DBNAME (default: lrs) 
+  DBCONNECTIONTIMEOUT (default: 60000)
+  DBSOCKETTIMEOUT (default: 300000)
+
+  PERMISSIONS_ENDPOINT_HOSTS (default: localhost /^\S+\.easygenerator.com$/)
+
+  TOKENS_URI (default: tokens-staging.easygenerator.com)
+  TOKENS_API_KEY (default: undefined)
+  APP_API_KEY (default: undefined)
+```
+You can check config.js for additional configuration options.
+
+4. Run application.
 
 ### Coding style tests
 
@@ -54,12 +71,19 @@ Run eslint coding style tests `npm run lint`.
 
 This updates a version number in package.json and creates a corresponding tag on GitHub.
 
-## Deployment
+### Docker support
 
-1. Run npm install.
-2. Modify `config.js` file if needed.
-3. To build the deployment package run
-  ```
-    deploy.bat {config [staging|live]} {tokensApiKey} {appApiKey}
-  ```
-By default package will be created at `D:/Applications/lrs` folder.
+You can build and run application using Docker.
+
+For example:
+- To build: `docker build -t lrs .`
+- To run: `docker run -e DBHOST="192.168.99.100" -e PERMISSIONS_ENDPOINT_HOSTS="localhost /^\S+\.easygenerator.com$/" -e TOKENS_URI="tokens-staging.easygenerator.com" -p 3000:3000 lrs`
+
+OR
+
+You can user docker-compose with docker-compose.yaml file whicn builds and runs LRS + mongodb. Do not use it in production.
+
+```
+docker-compose build
+docker-compose up
+```
