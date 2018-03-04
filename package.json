@@ -1,7 +1,7 @@
 {
   "name": "lrs",
   "version": "0.0.1",
-  "description": "lrs ===",
+  "description": "lrs",
   "main": "app.js",
   "dependencies": {
     "joi": "^13.0.0",
@@ -37,15 +37,13 @@
     "start": "node app.js",
     "precommit": "lint-staged && npm run test",
     "test": "node ./jasmine.js",
-    "lint": "eslint -c .eslintrc ./"
+    "lint": "eslint -c .eslintrc ./",
+    "preversion": "npm test",
+    "postversion": "git push && git push --tags"
   },
   "lint-staged": {
-    "*.js": [
-      "eslint"
-    ],
-    "*.json": [
-      "jsonlint-cli"
-    ]
+    "*.js": ["eslint"],
+    "*.json": ["jsonlint-cli"]
   },
   "repository": {
     "type": "git",

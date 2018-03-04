@@ -48,6 +48,12 @@ Service that stores learners results in xApi format.
 
 Run eslint coding style tests `npm run lint`.
 
+### Bumping version
+
+`npm version major | minor | patch`
+
+This updates a version number in package.json and creates a corresponding tag on GitHub.
+
 ## Deployment
 
 1. Run npm install.
