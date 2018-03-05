@@ -34,7 +34,7 @@ module.exports = {
             skip: options.specifiedSkip,
             sort: { timestamp: -1 },
             fields: { _id: 0 }
-        });
+        }).toArray();
 
         if (statements) {
             ctx.status = 200;
