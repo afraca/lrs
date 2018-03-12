@@ -1,6 +1,6 @@
 {
   "name": "lrs",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "lrs",
   "main": "app.js",
   "dependencies": {
@@ -42,8 +42,12 @@
     "postversion": "git push && git push --tags"
   },
   "lint-staged": {
-    "*.js": ["eslint"],
-    "*.json": ["jsonlint-cli"]
+    "*.js": [
+      "eslint"
+    ],
+    "*.json": [
+      "jsonlint-cli"
+    ]
   },
   "repository": {
     "type": "git",
