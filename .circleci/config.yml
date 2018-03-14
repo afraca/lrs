@@ -2,26 +2,39 @@ version: 2.0
 
 jobs:
   build:
-    machine: true
+    docker:
+      - image: circleci/node:latest
     working_directory: ~/lrs
     steps:
       - checkout
+      - setup_remote_docker
+
       - run:
-          name: Dump Docker credentials to file
+          name: Login to Docker registry
           command: |
-            echo $TLSCACERT | base64 --decode --ignore-garbage > ${HOME}/ca.pem
-            echo $TLSKEY | base64 --decode --ignore-garbage > ${HOME}/key.pem
-            echo $TLSCERT | base64 --decode --ignore-garbage > ${HOME}/cert.pem
+            docker login $DOCKER_REGISTRY -u $DOCKER_USER -p $DOCKER_PASSWORD
 
       - run:
           name: Build Docker image
-          command: docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem  -H $DOCKER_HOST build . -t lrs:$CIRCLE_BRANCH
-      
+          command: docker build . -t lrs:$CIRCLE_BRANCH
 
-  deploy-staging:
-    machine: true
+      - run:
+          name: Publish Docker image
+          command: |
+            docker tag lrs:$CIRCLE_BRANCH $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH
+            docker push $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH
+
+  deploy:
+    docker:
+      - image: circleci/node:latest
     working_directory: ~/lrs
     steps:
+      - setup_remote_docker
+      - run:
+          name: Login to Docker registry
+          command: |
+            docker login $DOCKER_REGISTRY -u $DOCKER_USER -p $DOCKER_PASSWORD
+
       - run:
           name: Dump Docker Credentials to file
           command: |
@@ -29,20 +42,34 @@ jobs:
             echo $TLSKEY | base64 --decode --ignore-garbage > ${HOME}/key.pem
             echo $TLSCERT | base64 --decode --ignore-garbage > ${HOME}/cert.pem
 
+      - run: 
+          name: Set CONTAINER_NAME variable
+          command: |
+            if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
+              echo 'export CONTAINER_NAME="lrs-staging"' >> $BASH_ENV
+            else
+              echo 'export CONTAINER_NAME="lrs-$CIRCLE_BRANCH"' >> $BASH_ENV
+            fi
+
+      - run:
+          name: Stop previous Docker container
+          command: |
+            docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $STAGING_DOCKER_HOST inspect $CONTAINER_NAME &> /dev/null && \
+              docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $STAGING_DOCKER_HOST stop $CONTAINER_NAME && \
+              docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $STAGING_DOCKER_HOST rm $CONTAINER_NAME || \
+              true
+
       - run:
           name: Run Docker container
           command: |
-            docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $DOCKER_HOST inspect lrs-$CIRCLE_BRANCH &> /dev/null && \
-              docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $DOCKER_HOST stop lrs-$CIRCLE_BRANCH && \
-              docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $DOCKER_HOST rm lrs-$CIRCLE_BRANCH
-
             docker \
               --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem \
-              -H $DOCKER_HOST \
+              -H $STAGING_DOCKER_HOST \
               run \
               -d \
-              --name lrs-$CIRCLE_BRANCH \
-              --env VIRTUAL_HOST="$STAGING_VIRTUAL_HOST" \
+              --name $CONTAINER_NAME \
+              --env VIRTUAL_HOST="$CONTAINER_NAME.$VIRTUAL_HOST" \
+              --env LETSENCRYPT_HOST="$CONTAINER_NAME.$VIRTUAL_HOST" \
               --env DBHOST="$STAGING_DBHOST" \
               --env LOG_LEVEL="verbose" \
               --env TOKENS_URI="$STAGING_TOKENS_URI" \
@@ -50,18 +77,16 @@ jobs:
               --env APP_API_KEY="$STAGING_APP_API_KEY" \
               --env PERMISSIONS_ENDPOINT_HOSTS="staging.easygenerator.com" \
               --restart on-failure \
-              lrs:$CIRCLE_BRANCH
+              $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH
 
 workflows:
   version: 2
   build-and-deploy:
     jobs:
       - build
-      - deploy-staging:
+      - deploy:
           requires:
             - build
           filters:
-            # branches:
-            #   only: master
             tags:
               ignore: /^v.*/
