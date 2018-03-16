@@ -79,6 +79,36 @@ jobs:
               --restart on-failure \
               $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH
 
+  prune:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/lrs
+    steps:
+      - run:
+          name: Dump Docker Credentials to file
+          command: |
+            echo $TLSCACERT | base64 --decode --ignore-garbage > ${HOME}/ca.pem
+            echo $TLSKEY | base64 --decode --ignore-garbage > ${HOME}/key.pem
+            echo $TLSCERT | base64 --decode --ignore-garbage > ${HOME}/cert.pem
+
+      - run: 
+          name: Set CONTAINER_NAME variable
+          command: |
+            if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
+              echo 'export CONTAINER_NAME="lrs-staging"' >> $BASH_ENV
+            else
+              echo 'export CONTAINER_NAME="lrs-$CIRCLE_BRANCH"' >> $BASH_ENV
+            fi
+
+      - run:
+          name: Stop previous Docker container
+          command: |
+            docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $STAGING_DOCKER_HOST inspect $CONTAINER_NAME &> /dev/null && \
+              docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $STAGING_DOCKER_HOST stop $CONTAINER_NAME && \
+              docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $STAGING_DOCKER_HOST rm $CONTAINER_NAME || \
+              true
+
+
 workflows:
   version: 2
   build-and-deploy:
@@ -90,3 +120,15 @@ workflows:
           filters:
             tags:
               ignore: /^v.*/
+      - hold:
+          type: approval
+          requires:
+           - deploy
+          filters:
+            branches:
+              ignore: master
+            tags:
+              ignore: /^v.*/
+      - prune:
+          requires:
+            - hold
