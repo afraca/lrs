@@ -1,5 +1,5 @@
 module.exports = {
-    xApiVersion: '1.0.2',
+    xApiVersion: '1.0.3',
 
     log: {
         level: process.env.LOG_LEVEL || 'warn'
