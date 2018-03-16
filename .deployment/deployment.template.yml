@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lrs-deployment
+  labels:
+    app: lrs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lrs
+  template:
+    metadata:
+      labels:
+        app: lrs
+    spec:
+      containers:
+      - name: lrs
+        image: ${IMAGE_NAME}
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DBHOST
+          value: "${DBHOST}"
+        - name: TOKENS_URI
+          value: "${TOKENS_URI}"
+        - name: TOKENS_API_KEY
+          value: "${TOKENS_API_KEY}"
+        - name: APP_API_KEY
+          value: "${APP_API_KEY}"
+        - name: PERMISSIONS_ENDPOINT_HOSTS
+          value: "${PERMISSIONS_ENDPOINT_HOSTS}"
+        - name: LOG_LEVEL
+          value: "warn"
+        livenessProbe:
+          httpGet:
+            path: /xAPI/about
+            port: 3000
+          initialDelaySeconds: 3
+          periodSeconds: 3
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lrs-service
+  labels:
+    app: lrs
+spec:
+  type: LoadBalancer
+  selector:
+    app: lrs
+  ports:
+  - port: 3101
+    targetPort: 3000
