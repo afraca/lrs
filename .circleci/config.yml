@@ -126,7 +126,7 @@ jobs:
               --env APP_API_KEY="$PRODUCTION_APP_API_KEY" \
               --env PERMISSIONS_ENDPOINT_HOSTS="PERMISSIONS_ENDPOINT_HOSTS" \
               --restart on-failure \
-              $DOCKER_REGISTRY/lrs:$$CIRCLE_BRANCH$CIRCLE_TAG
+              $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH$CIRCLE_TAG
 
 
   cleanup:
