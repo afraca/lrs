@@ -47,8 +47,10 @@ jobs:
           command: |
             if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
               echo 'export CONTAINER_NAME="lrs-staging"' >> $BASH_ENV
+              echo 'export VIRTUAL_HOST="reports-staging.$HOSTNAME"' >> $BASH_ENV
             else
               echo 'export CONTAINER_NAME="lrs-$CIRCLE_BRANCH"' >> $BASH_ENV
+              echo 'export VIRTUAL_HOST="reports-$CIRCLE_BRANCH.$DEV_PROXY.$HOSTNAME"' >> $BASH_ENV
             fi
 
       - run:
@@ -68,8 +70,8 @@ jobs:
               run \
               -d \
               --name $CONTAINER_NAME \
-              --env VIRTUAL_HOST="$CONTAINER_NAME.$VIRTUAL_HOST" \
-              --env LETSENCRYPT_HOST="$CONTAINER_NAME.$VIRTUAL_HOST" \
+              --env VIRTUAL_HOST="$VIRTUAL_HOST" \
+              --env LETSENCRYPT_HOST="$VIRTUAL_HOST" \
               --env DBHOST="$STAGING_DBHOST" \
               --env LOG_LEVEL="verbose" \
               --env TOKENS_URI="$STAGING_TOKENS_URI" \
