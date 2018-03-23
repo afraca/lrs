@@ -16,13 +16,13 @@ jobs:
 
       - run:
           name: Build Docker image
-          command: docker build . -t lrs:$CIRCLE_BRANCH
+          command: docker build . -t lrs:$CIRCLE_BRANCH$CIRCLE_TAG
 
       - run:
           name: Publish Docker image
           command: |
-            docker tag lrs:$CIRCLE_BRANCH $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH
-            docker push $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH
+            docker tag lrs:$CIRCLE_BRANCH $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH$CIRCLE_TAG
+            docker push $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH$CIRCLE_TAG
 
   deploy:
     docker:
@@ -124,7 +124,7 @@ jobs:
               --env APP_API_KEY="$PRODUCTION_APP_API_KEY" \
               --env PERMISSIONS_ENDPOINT_HOSTS="PERMISSIONS_ENDPOINT_HOSTS" \
               --restart on-failure \
-              $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH
+              $DOCKER_REGISTRY/lrs:$$CIRCLE_BRANCH$CIRCLE_TAG
 
 
   cleanup:
