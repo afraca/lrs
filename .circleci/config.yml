@@ -21,6 +21,8 @@ jobs:
       - run:
           name: Publish Docker image
           command: |
+            echo $CIRCLE_BRANCH
+            echo $CIRCLE_TAG
             docker tag lrs:$CIRCLE_BRANCH $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH$CIRCLE_TAG
             docker push $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH$CIRCLE_TAG
 
