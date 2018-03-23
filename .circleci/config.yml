@@ -79,7 +79,53 @@ jobs:
               --restart on-failure \
               $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH
 
-  prune:
+
+  deploy-production:
+    docker:
+      - image: circleci/node:latest
+    steps:
+      - setup_remote_docker
+      - run:
+          name: Login to Docker registry
+          command: |
+            docker login $DOCKER_REGISTRY -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+      - run:
+          name: Dump Docker Credentials to file
+          command: |
+            echo $ORG_TLS_CA_PRODUCTION | base64 --decode --ignore-garbage > ${HOME}/ca.pem
+            echo $ORG_TLS_KEY_PRODUCTION | base64 --decode --ignore-garbage > ${HOME}/key.pem
+            echo $ORG_TLS_CERT_PRODUCTION | base64 --decode --ignore-garbage > ${HOME}/cert.pem
+
+      - run:
+          name: Stop previous Docker container
+          command: |
+            docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $ORG_DOCKER_HOST_PRODUCTION inspect lrs &> /dev/null && \
+              docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $ORG_DOCKER_HOST_PRODUCTION stop lrs && \
+              docker --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem -H $ORG_DOCKER_HOST_PRODUCTION rm lrs || \
+              true
+
+      - run:
+          name: Run Docker container
+          command: |
+            docker \
+              --tlsverify --tlscacert=${HOME}/ca.pem --tlscert=${HOME}/cert.pem --tlskey=${HOME}/key.pem \
+              -H $ORG_DOCKER_HOST_PRODUCTION \
+              run \
+              -d \
+              --name lrs \
+              --env VIRTUAL_HOST="$PRODUCTION_VIRTUAL_HOST" \
+              --env DBHOST="$PRODUCTION_DBHOST" \
+              --env LOG_LEVEL="verbose" \
+              --env TOKENS_URI="$PRODUCTION_TOKENS_URI" \
+              --env TOKENS_API_KEY="$PRODUCTION_TOKENS_API_KEY" \
+              --env APP_API_KEY="$PRODUCTION_APP_API_KEY" \
+              --env PERMISSIONS_ENDPOINT_HOSTS="PERMISSIONS_ENDPOINT_HOSTS" \
+              --restart on-failure \
+              $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH
+
+
+  cleanup:
     docker:
       - image: circleci/node:latest
     working_directory: ~/lrs
@@ -129,6 +175,24 @@ workflows:
               ignore: master
             tags:
               ignore: /^v.*/
-      - prune:
+      - cleanup:
           requires:
             - hold
+      - approve-deploy-production:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - deploy-production:
+          context: Environment setup
+          requires:
+            - approve-deploy-production
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
