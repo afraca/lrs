@@ -23,7 +23,7 @@ jobs:
           command: |
             echo $CIRCLE_BRANCH
             echo $CIRCLE_TAG
-            docker tag lrs:$CIRCLE_BRANCH $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH$CIRCLE_TAG
+            docker tag lrs:$CIRCLE_BRANCH$CIRCLE_TAG $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH$CIRCLE_TAG
             docker push $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH$CIRCLE_TAG
 
   deploy:
