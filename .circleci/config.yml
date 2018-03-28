@@ -77,7 +77,6 @@ jobs:
               --env TOKENS_URI="$STAGING_TOKENS_URI" \
               --env TOKENS_API_KEY="$STAGING_TOKENS_API_KEY" \
               --env APP_API_KEY="$STAGING_APP_API_KEY" \
-              --env PERMISSIONS_ENDPOINT_HOSTS="staging.easygenerator.com" \
               --restart on-failure \
               $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH
 
@@ -122,7 +121,7 @@ jobs:
               --env TOKENS_URI="$PRODUCTION_TOKENS_URI" \
               --env TOKENS_API_KEY="$PRODUCTION_TOKENS_API_KEY" \
               --env APP_API_KEY="$PRODUCTION_APP_API_KEY" \
-              --env PERMISSIONS_ENDPOINT_HOSTS="PERMISSIONS_ENDPOINT_HOSTS" \
+              --env PERMISSIONS_ENDPOINT_HOSTS="live.easygenerator.com" \
               --restart on-failure \
               $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH$CIRCLE_TAG
 
