@@ -6,14 +6,18 @@ module.exports = class {
             throw 'You should provide spec for the result';
         }
 
+        let actorHasHomePage = spec.actor.account && spec.actor.account.homePage;
+
         this.score = spec.score;
         this.status = spec.status;
         this.entityTitle = spec.entityTitle;
         this.actorName = spec.actor.name;
         this.actorEmail = '-';
-        if (spec.actor.email) {
+        if (spec.actor.email && actorHasHomePage) {
+            this.actorEmail = `${spec.actor.email} ${localizationManager.localize('from')} ${spec.actor.account.homePage}`;
+        } else if(spec.actor.email) {
             this.actorEmail = spec.actor.email;
-        } else if (spec.actor.account && spec.actor.account.homePage) {
+        } else if (actorHasHomePage) {
             this.actorEmail =
             `${localizationManager.localize('from')} ${spec.actor.account.homePage}`;
         }
