@@ -70,6 +70,7 @@ jobs:
               run \
               -d \
               --name $CONTAINER_NAME \
+              --env HTTPS_METHOD="noredirect" \
               --env VIRTUAL_HOST="$VIRTUAL_HOST" \
               --env LETSENCRYPT_HOST="$VIRTUAL_HOST" \
               --env DBHOST="$STAGING_DBHOST" \
@@ -115,6 +116,7 @@ jobs:
               run \
               -d \
               --name lrs \
+              --env HTTPS_METHOD="noredirect" \
               --env VIRTUAL_HOST="$PRODUCTION_VIRTUAL_HOST" \
               --env DBHOST="$PRODUCTION_DBHOST" \
               --env LOG_LEVEL="verbose" \
