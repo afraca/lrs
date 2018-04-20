@@ -23,7 +23,8 @@ module.exports = {
         return this.get(Object.assign({ embeded: 1 }, fields), id,
             specifiedSkip, specifiedLimit, since, until);
     },
-    async getCsv(id, isCourseResult, specifiedSkip, specifiedLimit, since, until, csv, cultures) {
+    async getCsv(id, isCourseResult, specifiedSkip, specifiedLimit, since, until, csv, cultures,
+        timezone) {
         let localizationManager = await LocalizationManager.create(cultures);
         let structure;
         let criteria;
@@ -41,7 +42,8 @@ module.exports = {
                 criteria.skip, criteria.limit);
         }
 
-        let csvGenerator = new CsvGenerator(structure, isCourseResult, localizationManager);
+        let csvGenerator = new CsvGenerator(structure, isCourseResult, localizationManager,
+            timezone);
         let header = csvGenerator.getHeaderRow();
 
         return cursor.stream().pipe(jsonStream.stringify(null, data =>

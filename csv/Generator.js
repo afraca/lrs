@@ -6,13 +6,13 @@ const CourseDataMapper = require('./course/DataMapper');
 const LearningPathDataMapper = require('./learningPath/DataMapper');
 
 module.exports = class Generator {
-    constructor(entityStructure, isCourseResults, localizationManager) {
+    constructor(entityStructure, isCourseResults, localizationManager, timezone) {
         this.structure = entityStructure && entityStructure.structure;
         let provider = isCourseResults ? new CourseFieldProvider(localizationManager)
             : new LearningPathFieldProvider(localizationManager);
         this.fields = provider.getCsvFields(this.structure);
-        this.dataMapper = isCourseResults ? new CourseDataMapper(localizationManager)
-            : new LearningPathDataMapper(localizationManager);
+        this.dataMapper = isCourseResults ? new CourseDataMapper(localizationManager, timezone)
+            : new LearningPathDataMapper(localizationManager, timezone);
     }
 
     getHeaderRow() {

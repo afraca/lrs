@@ -27,7 +27,7 @@ module.exports = {
             let idKey = isCourseResult ? courseKey : learningPathKey;
             stream = await command.getCsv(options.objectId[idKey], isCourseResult,
                 options.specifiedSkip, options.specifiedLimit, options.since,
-                options.until, csv, options.cultures);
+                options.until, csv, options.cultures, options.timezone);
             contentType = 'text/csv';
         } else if (loadEmbededStatements) {
             stream = await command.getFull(options.objectId[courseKey], options.specifiedSkip,

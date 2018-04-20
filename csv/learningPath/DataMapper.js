@@ -2,8 +2,8 @@ const DataMapper = require('../common/DataMapper');
 const LearningPathResultsMapper = require('../../mappers/learningPath/resultMapper');
 
 module.exports = class LearningPathDataMapper extends DataMapper {
-    constructor(localizationManager) {
-        super(localizationManager);
+    constructor(localizationManager, timezone) {
+        super(localizationManager, timezone);
         this.resultMapper = new LearningPathResultsMapper(this.localizationManager);
     }
 

@@ -12,8 +12,8 @@ const givenAnswerSupportedQuestionTypes = [
 ];
 
 module.exports = class CourseDataMapper extends DataMapper {
-    constructor(localizationManager) {
-        super(localizationManager);
+    constructor(localizationManager, timezone) {
+        super(localizationManager, timezone);
 
         this.staticTexts = {
             reportingInfoNotAvailable: localizationManager.localize('reportingInfoNotAvailable'),

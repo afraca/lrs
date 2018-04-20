@@ -12,6 +12,7 @@ module.exports = {
         let since;
         let until;
         let cultures;
+        let timezone;
 
         for (let prop in query) {
             if (prop === 'limit') {
@@ -66,6 +67,10 @@ module.exports = {
                 cultures = query.cultures.split(',');
             }
 
+            if (prop === 'timezone') {
+                timezone = query.timezone;
+            }
+
             if (prop.indexOf('context.extensions.') === 0) {
                 criteria[prop] = query[prop];
                 objectId[prop] = query[prop];
@@ -118,7 +123,8 @@ module.exports = {
             specifiedSkip,
             since,
             until,
-            cultures
+            cultures,
+            timezone
         };
     }
 };

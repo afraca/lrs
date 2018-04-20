@@ -1,11 +1,13 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
 const resultStatus = require('../../models/results/resultStatus');
 
 const DateFormatString = 'YYYY-MM-DD HH:mm:ss';
+const DefaultTimeZone = 'UTC';
 
 module.exports = class DataMapper {
-    constructor(localizationManager) {
+    constructor(localizationManager, timezone) {
         this.localizationManager = localizationManager;
+        this.timezone = timezone || DefaultTimeZone;
     }
 
     map(result) {
@@ -22,7 +24,7 @@ module.exports = class DataMapper {
             return defaultValue;
         }
 
-        return moment(date).format(DateFormatString);
+        return moment(date).tz(this.timezone).format(DateFormatString);
     }
 
     _getStatusString(status) {
