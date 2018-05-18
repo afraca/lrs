@@ -70,6 +70,7 @@ jobs:
               run \
               -d \
               --name $CONTAINER_NAME \
+              --network reverse_proxy \
               --env HTTPS_METHOD="noredirect" \
               --env VIRTUAL_HOST="$VIRTUAL_HOST" \
               --env LETSENCRYPT_HOST="$VIRTUAL_HOST" \
@@ -116,6 +117,7 @@ jobs:
               run \
               -d \
               --name lrs \
+              --network reverse_proxy \
               --env HTTPS_METHOD="noredirect" \
               --env VIRTUAL_HOST="$PRODUCTION_VIRTUAL_HOST" \
               --env DBHOST="$PRODUCTION_DBHOST" \
