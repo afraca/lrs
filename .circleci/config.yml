@@ -125,7 +125,7 @@ jobs:
               --env TOKENS_URI="$PRODUCTION_TOKENS_URI" \
               --env TOKENS_API_KEY="$PRODUCTION_TOKENS_API_KEY" \
               --env APP_API_KEY="$PRODUCTION_APP_API_KEY" \
-              --env PERMISSIONS_ENDPOINT_HOSTS="live.easygenerator.com" \
+              --env PERMISSIONS_ENDPOINT_HOSTS="live.easygenerator.com,beta.easygenerator.com" \
               --restart on-failure \
               $DOCKER_REGISTRY/lrs:$CIRCLE_BRANCH$CIRCLE_TAG
 

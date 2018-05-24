@@ -21,7 +21,7 @@ module.exports = {
 
     permissionsEndpoint: {
         hosts: (process.env.PERMISSIONS_ENDPOINT_HOSTS &&
-            process.env.PERMISSIONS_ENDPOINT_HOSTS.split(' ')) || [
+            process.env.PERMISSIONS_ENDPOINT_HOSTS.split(',')) || [
                 'localhost',
                 /^\S+\.easygenerator.com$/
             ],
