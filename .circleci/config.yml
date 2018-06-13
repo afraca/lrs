@@ -73,7 +73,6 @@ jobs:
               --network reverse_proxy \
               --env HTTPS_METHOD="noredirect" \
               --env VIRTUAL_HOST="$VIRTUAL_HOST" \
-              --env LETSENCRYPT_HOST="$VIRTUAL_HOST" \
               --env DBHOST="$STAGING_DBHOST" \
               --env LOG_LEVEL="verbose" \
               --env TOKENS_URI="$STAGING_TOKENS_URI" \
