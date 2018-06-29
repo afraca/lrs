@@ -7,6 +7,7 @@ module.exports = class {
         }
 
         let actorHasHomePage = spec.actor.account && spec.actor.account.homePage;
+        let actorHasAccountName = spec.actor.account && spec.actor.account.name;
 
         this.score = spec.score;
         this.status = spec.status;
@@ -15,7 +16,9 @@ module.exports = class {
         this.actorEmail = '-';
         if (spec.actor.email && actorHasHomePage) {
             this.actorEmail = `${spec.actor.email} ${localizationManager.localize('from')} ${spec.actor.account.homePage}`;
-        } else if(spec.actor.email) {
+        } else if (actorHasAccountName && actorHasHomePage) {
+            this.actorEmail = `${spec.actor.account.name} ${localizationManager.localize('from')} ${spec.actor.account.homePage}`;
+        } else if (spec.actor.email) {
             this.actorEmail = spec.actor.email;
         } else if (actorHasHomePage) {
             this.actorEmail =
