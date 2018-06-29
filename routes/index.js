@@ -17,6 +17,7 @@ router.get('/entity/structure', auth, entityStructure.get);
 
 router.use(verifyXapiVersion);
 router.post('/xAPI/statements', statements.post);
+router.post('/statements', statements.post);
 
 router.post('/xAPI/results/archive/:attemptId', idTokenAuth, results.archive);
 router.post('/xAPI/results/unarchive/:attemptId', idTokenAuth, results.unarchive);
